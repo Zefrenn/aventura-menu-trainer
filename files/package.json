@@ -1,0 +1,9 @@
+{
+  "name": "aventura-menu-trainer",
+  "version": "2.0.1",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vercel/blob": "^2.8.0"
+  }
+}

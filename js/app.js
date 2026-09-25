@@ -205,29 +205,44 @@ y.style.opacity=dx>0?p:0; n.style.opacity=dx<0?p:0;
 }
 function setPos(dx){ SW.style.transform=`translateX(${dx}px) rotate(${dx/22}deg)`; stamps(dx); STACK.classList.toggle("pull",Math.abs(dx)>60); }
 function threshold(){ return Math.min(130, SW.clientWidth*0.36); }
-SW.addEventListener("pointerdown",e=>{
-if(busy) return; if(e.pointerType==="mouse"&&e.button!==0) return;
-if(e.target.closest("details,summary,a,button,input")) return;
-drag={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0,t:performance.now(),lock:null,vx:0,lx:e.clientX,lt:performance.now()};
-});
-SW.addEventListener("pointermove",e=>{
-if(!drag||e.pointerId!==drag.id) return;
-drag.dx=e.clientX-drag.x; drag.dy=e.clientY-drag.y;
-if(!drag.lock){ if(Math.abs(drag.dx)>8||Math.abs(drag.dy)>8) drag.lock=Math.abs(drag.dx)>Math.abs(drag.dy)*1.15?"x":"y"; if(drag.lock==="x"){ try{SW.setPointerCapture(e.pointerId);}catch(_){} SW.classList.add("dragging"); } }
-if(drag.lock==="x"){ const now=performance.now(); drag.vx=(e.clientX-drag.lx)/Math.max(1,now-drag.lt); drag.lx=e.clientX; drag.lt=now; setPos(drag.dx); }
-});
-function endDrag(e){
-if(!drag||(e&&e.pointerId!==drag.id)) return;
+// Mouse/pen use Pointer Events. Touch uses Touch Events directly: Safari (esp. iOS) fires pointercancel
+// as soon as it decides to scroll, and setPointerCapture on touch pointers is unreliable there.
+function startDrag(id,x,y){ if(busy) return; drag={id,x,y,dx:0,dy:0,t:performance.now(),lock:null,vx:0,lx:x,lt:performance.now()}; }
+function moveDrag(id,x,y){
+if(!drag||id!==drag.id) return false;
+drag.dx=x-drag.x; drag.dy=y-drag.y;
+if(!drag.lock){ if(Math.abs(drag.dx)>8||Math.abs(drag.dy)>8) drag.lock=Math.abs(drag.dx)>Math.abs(drag.dy)*1.15?"x":"y"; if(drag.lock==="x") SW.classList.add("dragging"); }
+if(drag.lock==="x"){ const now=performance.now(); drag.vx=(x-drag.lx)/Math.max(1,now-drag.lt); drag.lx=x; drag.lt=now; setPos(drag.dx); return true; }
+return false;
+}
+function endDrag(id,cancelled){
+if(!drag||id!==drag.id) return;
 const d=drag; drag=null; SW.classList.remove("dragging");
-if(d.lock==="x"){
+if(d.lock==="x"&&!cancelled){
 const flick=Math.abs(d.vx)>0.65&&Math.abs(d.dx)>30;
 if(Math.abs(d.dx)>threshold()||flick) commit(d.dx>0?1:-1);
 else { setPos(0); STACK.classList.remove("pull"); }
-} else if(!d.lock&&Math.abs(d.dx)<8&&Math.abs(d.dy)<8&&performance.now()-d.t<500&&e&&e.type==="pointerup"){ flipCard(); }
+} else if(!d.lock&&!cancelled&&Math.abs(d.dx)<8&&Math.abs(d.dy)<8&&performance.now()-d.t<500){ flipCard(); }
 else { setPos(0); STACK.classList.remove("pull"); }
 }
-SW.addEventListener("pointerup",endDrag); SW.addEventListener("pointercancel",endDrag);
-SW.addEventListener("lostpointercapture",()=>{ if(drag&&drag.lock==="x"){ endDrag({pointerId:drag.id,type:"cancel"}); } });
+function skipTarget(t){ return !!(t&&t.closest&&t.closest("details,summary,a,button,input")); }
+// --- touch ---
+SW.addEventListener("touchstart",e=>{ if(drag||e.touches.length!==1||skipTarget(e.target)) return; const t=e.touches[0]; startDrag("t"+t.identifier,t.clientX,t.clientY); },{passive:true});
+SW.addEventListener("touchmove",e=>{ if(!drag) return; const t=Array.from(e.changedTouches).find(t=>"t"+t.identifier===drag.id); if(!t) return;
+if(moveDrag(drag.id,t.clientX,t.clientY)&&e.cancelable) e.preventDefault(); },{passive:false});
+function touchEnd(e){ if(!drag) return; const t=Array.from(e.changedTouches).find(t=>"t"+t.identifier===drag.id); if(t) endDrag(drag.id,e.type==="touchcancel"); }
+SW.addEventListener("touchend",touchEnd); SW.addEventListener("touchcancel",touchEnd);
+// --- mouse / pen ---
+SW.addEventListener("pointerdown",e=>{
+if(e.pointerType==="touch"||busy||drag) return; if(e.pointerType==="mouse"&&e.button!==0) return;
+if(skipTarget(e.target)) return;
+startDrag(e.pointerId,e.clientX,e.clientY); try{SW.setPointerCapture(e.pointerId);}catch(_){}
+});
+SW.addEventListener("pointermove",e=>{ if(e.pointerType==="touch") return; moveDrag(e.pointerId,e.clientX,e.clientY); });
+SW.addEventListener("pointerup",e=>{ if(e.pointerType==="touch") return; endDrag(e.pointerId,false); });
+SW.addEventListener("pointercancel",e=>{ if(e.pointerType==="touch") return; endDrag(e.pointerId,true); });
+// keep a mouse drag alive if the cursor leaves the window without capture
+window.addEventListener("mouseup",()=>{ if(drag&&typeof drag.id==="number") endDrag(drag.id,false); });
 // dir: +1 right, -1 left. Right = got it / (browse mode) back · Left = still learning / (browse mode) next
 function commit(dir,rate){
 if(busy) return; busy=true; if(rate===undefined) rate=swipeRates;

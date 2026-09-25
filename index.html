@@ -80,13 +80,15 @@ header .menus{margin:3px 0 0;font-size:13.5px;color:var(--gray-3);font-style:ita
 .swipe{position:absolute;inset:0;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;will-change:transform;cursor:grab;transition:transform .32s var(--ease),opacity .3s;}
 .swipe.dragging{transition:none;cursor:grabbing;}
 .swipe.deal{transition:transform .32s var(--ease),opacity .25s;}
-.card{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s var(--ease);border-radius:var(--r);}
+.card{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.45,0,.55,1);border-radius:var(--r);}
 .card.flipped{transform:rotateY(180deg);}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r);background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow-lg);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:22px 20px 20px;display:flex;flex-direction:column;}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;touch-action:pan-y;transition:visibility 0s linear .25s;border-radius:var(--r);background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow-lg);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:22px 20px 20px;display:flex;flex-direction:column;}
 .face::-webkit-scrollbar{width:0;}
 .front{align-items:center;text-align:center;}
 .front .inner{margin:auto 0;width:100%;display:flex;flex-direction:column;align-items:center;}
 .back{transform:rotateY(180deg);}
+/* Safari still hit-tests a backface-hidden face, so the inactive face is hidden for real (swapped mid-flip). */
+.card:not(.flipped) .back,.card.flipped .front{visibility:hidden;pointer-events:none;}
 .stamp{position:absolute;top:22px;font-family:var(--disp);font-weight:700;font-size:20px;letter-spacing:.22em;text-transform:uppercase;padding:8px 12px 6px;border:3px solid;border-radius:8px;opacity:0;pointer-events:none;z-index:3;transform:rotate(-12deg);transition:opacity .1s;backface-visibility:hidden;}
 .stamp.yes{right:20px;color:var(--rose-deep);border-color:var(--rose);background:rgba(255,255,255,.85);transform:rotate(12deg);}
 .stamp.no{left:20px;color:var(--gray);border-color:var(--gray-3);background:rgba(255,255,255,.85);}
@@ -215,7 +217,7 @@ details.ing p{margin:4px 0 0;font-size:15px;line-height:1.5;}
 .toast.show{opacity:1;transform:translate(-50%,0);}
 
 @media (max-width:360px){ .spec{grid-template-columns:1fr;} header .logo{height:44px;} .actions{grid-template-columns:44px 1fr 1fr 44px;gap:6px;} }
-@media (prefers-reduced-motion: reduce){ .card,.swipe,.ghost,.sheet,.sheet .panel,.modes button,.toast{transition:none!important;} }
+@media (prefers-reduced-motion: reduce){ .card,.face,.swipe,.ghost,.sheet,.sheet .panel,.modes button,.toast{transition:none!important;} }
 </style>
 </head>
 <body>

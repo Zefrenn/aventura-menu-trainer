@@ -13,13 +13,16 @@ const PHOTO_SEED = {
                           note: "Tulip, pale gold, green wheel — looks like El Parque. Confirm before staff see it." },
 };
 let PHOTO_IDX = {};
+// Dishes renamed for the 9/11 menu — photos already uploaded under the old id keep working.
+const PHOTO_ALIAS = { "f-pepa-en-adobo": "f-mahi-en-adobo", "f-goxua": "f-passionfruit-goxua", "f-avenchurros": "f-churros", "f-gambas": "f-gambas-al-ajillo", "f-primavera": "f-paella-primavera", "d-sinfonia-agridulce": "d-pecas" };
 function photoId(kind, name) {
   return kind + "-" + String(name).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 // all=true (manager) returns hidden/pending too
 function photoOf(kind, name, all) {
-  const id = photoId(kind, name), x = PHOTO_IDX[id], s = PHOTO_SEED[id];
+  let id = photoId(kind, name), x = PHOTO_IDX[id], s = PHOTO_SEED[id];
+  if (!x && !s && PHOTO_ALIAS[id]) { id = PHOTO_ALIAS[id]; x = PHOTO_IDX[id]; s = PHOTO_SEED[id]; }
   let p = null;
   if (x && x.src === "blob") p = { id, url: `/api/photo?id=${id}&v=${x.v}`, at: x.at, by: x.by, note: x.note, status: x.status || "ok", src: "blob" };
   else if (s) p = { id, url: s.src, at: s.at, by: s.by, note: (x && x.note !== undefined) ? x.note : s.note, status: (x && x.status) || s.status, src: "seed" };

@@ -83,7 +83,7 @@ return true;
 }
 function showGate(){
 const known=Object.values(store.profiles).sort((a,b)=>(b.updated||0)-(a.updated||0)).slice(0,8);
-$("gateMsg").textContent="Enter your first name and last initial (e.g. Maria R). Use the same name every time — your progress is saved under it.";
+$("gateMsg").textContent=known.length?"Tap your name, or type it below. Use the same name every time so your progress follows you.":"Type your first name and last initial. Use the same name every time so your progress follows you to any phone.";
 $("gateKnown").innerHTML=known.map(p=>`<button data-s="${p.slug}">${p.name}</button>`).join("");
 [...$("gateKnown").children].forEach(b=>b.onclick=()=>{setProfile(store.profiles[b.dataset.s].name);resetDeck();});
 $("gateName").value=""; $("gate").classList.remove("hidden"); setTimeout(()=>$("gateName").focus(),50);
@@ -125,35 +125,37 @@ const c=deck[idx]; if(!c) return; if(!quiet) $("card").classList.remove("flipped
 if(me&&!quiet){ rec(c).seen++; persist(); }
 if(c.kind==="drink"){
 const d=c.d;
-$("front").innerHTML=`<div class="cat">${d.cat.toUpperCase()}</div><div class="name">${d.name}</div><div class="price">${d.price}</div>${visual("d",d.name,ILLUS[d.name],"illus")}<div class="hint">Say glass, build & garnish — tap to check</div>`;
+$("front").innerHTML=`<div class="cat">${d.cat.toUpperCase()}</div><div class="name">${d.name}</div><div class="price">${d.price}</div>${visual("d",d.name,ILLUS[d.name],"illus")}<div class="hint">Say the glass, build and garnish out loud — then tap to check.</div>`;
 const chips=d.colors.length
-?`<div class="chips">${d.colors.map(cl=>`<span class="chip" style="background:${TAPE[cl]}"></span>`).join("")}<span class="lbl">batch bottle — ${d.bottle||d.colors.join(" + ")}</span></div>`
-:`<div class="chips"><span class="lbl">no batch color — built à la minute</span></div>`;
-const sell=d.sell?`<div class="row"><b>SELL IT</b><br><i>${d.sell}</i></div>`:"";
-$("back").innerHTML=`<div class="cat">${d.cat.toUpperCase()}</div>${visual("d",d.name,ILLUS[d.name],"illus","mini")}<h3>${d.name}</h3>
-<div class="row"><b>MENU</b><br>${d.menu}</div>
-<div class="row"><b>GLASS</b><br>${d.glass}</div>
-<div class="row"><b>BUILD</b><br>${d.build.join(" · ")}</div>
-<div class="row"><b>GARNISH</b><br>${d.garnish}</div>${sell}${chips}`;
+?`<div class="chips">${d.colors.map(cl=>`<span class="chip" style="background:${TAPE[cl]}" aria-hidden="true"></span>`).join("")}<span class="lbl">Batch bottle: ${d.bottle||d.colors.join(" + ")} tape</span></div>`
+:`<div class="chips"><span class="lbl">No batch bottle — built to order</span></div>`;
+$("back").innerHTML=`<div class="cat">${d.cat.toUpperCase()} · ${d.price}</div>${visual("d",d.name,ILLUS[d.name],"illus","mini")}<h2 class="dname">${d.name}</h2>
+<div class="spec"><div><b>GLASS</b>${d.glass}</div><div><b>GARNISH</b>${d.garnish}</div></div>
+<div class="row"><b>BUILD</b><ol class="steps">${d.build.map(x=>`<li>${x}</li>`).join("")}</ol></div>${chips}
+${d.sell?`<div class="callout"><span class="lbl">SELL IT</span><p class="drop">${d.sell}</p></div>`:""}
+<div class="menuline">On the menu: ${d.menu}</div>`;
 } else if(c.kind==="food"){
 const f=c.fd;
-$("front").innerHTML=`<div class="cat">${f.cat.toUpperCase()}</div><div class="name">${f.name}</div>${visual("f",f.name,FOODILLUS[f.ill],"fillus")}<div class="hint">Say the drop line, allergens & mods — tap to check</div>`;
-$("back").innerHTML=`<div class="cat">${f.cat.toUpperCase()}</div>${visual("f",f.name,FOODILLUS[f.ill],"fillus","mini")}<h3>${f.name}</h3>
-<div class="row"><b>DROP LINE</b><div class="drop">“${f.drop}”</div></div>
-<div class="row"><b>ALLERGENS</b>${achips(f.all)}</div>
+const parts=f.all.split("·"), list=parts[0].split(",").map(a=>a.trim()).filter(Boolean);
+const major=list.filter(a=>MAJOR.test(a)), minor=list.filter(a=>!MAJOR.test(a));
+const tipWarn=f.tip&&/allerg|gluten|fin fish|gelatin|fish|vegetarian|halal|kosher/i.test(f.tip);
+$("front").innerHTML=`<div class="cat">${f.cat.toUpperCase()}</div><div class="name">${f.name}</div>${visual("f",f.name,FOODILLUS[f.ill],"fillus")}<div class="hint">Say the drop line, allergens and mods out loud — then tap to check.</div>`;
+$("back").innerHTML=`<div class="cat">${f.cat.toUpperCase()}</div>${visual("f",f.name,FOODILLUS[f.ill],"fillus","mini")}<h2 class="dname">${f.name}</h2>
+<div class="callout"><span class="lbl">DROP LINE</span><p class="drop">“${f.drop}”</p></div>
+${f.tip?`<div class="callout${tipWarn?" warn":""}"><span class="lbl">${tipWarn?"KNOW THIS":"TIP"}</span><p class="drop" style="font-style:normal;font-size:15px">${f.tip}</p></div>`:""}
+<div class="row"><b>MAJOR ALLERGENS</b>${major.length?`<div class="achips">${major.map(a=>`<span class="achip major">${aicon(a)}${a}</span>`).join("")}</div>`:`<div class="also">None of the major allergens</div>`}${minor.length?`<div class="also">Also contains: ${minor.join(", ")}</div>`:""}${parts[1]?`<div class="cc">⚠ ${parts[1].trim()}</div>`:""}</div>
 <div class="row"><b>DIETS</b>${dietBadges(f.name)}</div>
-<div class="row"><b>MODS</b><br>${f.mods}</div>
-<div class="row"><b>SERVE WITH</b><br>${f.ut}</div>
-<div class="row"><b>IN IT</b><br><span style="font-size:13px;color:var(--mute)">${f.ing}</span></div>${f.tip?`<div class="tip">★ ${f.tip}</div>`:""}`;
+<div class="spec"><div><b>MODS</b>${f.mods}</div><div><b>SERVE WITH</b>${f.ut}</div></div>
+<details class="ing"><summary>Full ingredient list</summary><p>${f.ing}</p></details>`;
 } else if(c.kind==="fact"){
 const f=c.f;
 $("front").innerHTML=`<div class="cat">${f.cat.toUpperCase()}</div><div class="name" style="font-size:24px">${f.q}</div><div class="hint">Tap to reveal</div>`;
-$("back").innerHTML=`<div class="cat">${f.cat.toUpperCase()}</div><h3 style="font-size:18px">${f.q}</h3>
+$("back").innerHTML=`<div class="cat">${f.cat.toUpperCase()}</div><h2 class="dname" style="font-size:18px">${f.q}</h2>
 <div class="row"><b>ANSWER</b><br>${f.a}</div>${f.x?`<div class="row"><b>MORE</b><br>${f.x}</div>`:""}`;
 } else {
 const w=c.w;
 $("front").innerHTML=`<div class="cat">WINES BY THE GLASS</div><div class="name" style="font-size:22px">${w.name}</div><div class="price">${w.price}</div><div class="wglass">${WGLASS[wineKind(w)]}</div><div class="hint">Grape · place · notes · one story · pairing</div>`;
-$("back").innerHTML=`<div class="cat">WINES BY THE GLASS</div><div class="wglass mini">${WGLASS[wineKind(w)]}</div><h3 style="font-size:17px">${w.name}</h3>
+$("back").innerHTML=`<div class="cat">WINES BY THE GLASS</div><div class="wglass mini">${WGLASS[wineKind(w)]}</div><h2 class="dname" style="font-size:17px">${w.name}</h2>
 <div class="row"><b>NOTES</b><br><i>${w.notes}</i></div>
 <div class="row"><b>GRAPE</b><br>${w.grape}</div>
 <div class="row"><b>STORY</b><br>${w.story}</div>
@@ -163,16 +165,22 @@ $("back").innerHTML=`<div class="cat">WINES BY THE GLASS</div><div class="wglass
 const st=stateOf(c);
 $("front").insertAdjacentHTML("beforeend",`<div class="mstate ${st}">${st==="mastered"?"MASTERED":st==="learning"?"STILL LEARNING":"NEW"}</div>`);
 $("counter").textContent=`${idx+1} of ${deck.length}${weakOnly?" · weak cards":""}`;
-// grow card to fit the taller face (so nothing is clipped)
-const card=$("card"); card.style.minHeight="360px";
-requestAnimationFrame(()=>{card.style.minHeight=Math.max(360,$("front").scrollHeight+4,$("back").scrollHeight+4)+"px";});
+fitCard(); syncFaces();
+$("back").querySelectorAll("details").forEach(d=>d.addEventListener("toggle",fitCard));
 }
-$("card").onclick=()=>$("card").classList.toggle("flipped");
-$("flip").onclick=()=>$("card").classList.toggle("flipped");
+// grow card to fit the taller face (so nothing is clipped)
+function fitCard(){ const card=$("card"); card.style.minHeight="360px";
+requestAnimationFrame(()=>{card.style.minHeight=Math.max(360,$("front").scrollHeight+4,$("back").scrollHeight+4)+"px";}); }
+// only the visible face is exposed to screen readers
+function syncFaces(){ const f=$("card").classList.contains("flipped"); $("front").setAttribute("aria-hidden",f?"true":"false"); $("back").setAttribute("aria-hidden",f?"false":"true"); $("flip").textContent=f?"Show front":"Flip"; }
+function flipCard(){ $("card").classList.toggle("flipped"); syncFaces(); }
+$("card").onclick=e=>{ if(e.target.closest("details,summary,a,button")) return; flipCard(); };
+$("card").onkeydown=e=>{ if(e.target!==$("card")) return; if(e.key==="Enter"||e.key===" "){ e.preventDefault(); flipCard(); } else if(e.key==="ArrowRight") $("next").click(); else if(e.key==="ArrowLeft") $("prev").click(); };
+$("flip").onclick=flipCard;
 $("next").onclick=()=>{idx=(idx+1)%deck.length;render();};
 $("prev").onclick=()=>{idx=(idx-1+deck.length)%deck.length;render();};
 $("shuffle").onclick=()=>{shuffleArr(deck);idx=0;render();};
-$("weakOnly").onclick=()=>{weakOnly=!weakOnly;$("weakOnly").textContent=weakOnly?"All cards":"Weak cards only";resetDeck();};
+$("weakOnly").onclick=()=>{weakOnly=!weakOnly;$("weakOnly").textContent=weakOnly?"Show all cards":"Review weak cards";$("weakOnly").setAttribute("aria-pressed",weakOnly?"true":"false");resetDeck();};
 function rate(v){ if(!me)return; const r=rec(deck[idx]); r.rate=v; if(v==="got"){r.right++;} persist(); idx=(idx+1)%deck.length; render(); }
 $("rGot").onclick=()=>rate("got"); $("rLearn").onclick=()=>rate("learn");
 // ---- quiz ----
@@ -282,7 +290,7 @@ $("qMissed").innerHTML=round.missed.length?`<div class="cat">MISSED</div>`+round
 $("qRetry").disabled=!round.missed.length; $("qRetry").style.opacity=round.missed.length?1:.4;
 }
 function nextQuestion(){ startRound(); }
-$("qNext").onclick=()=>{ if(!answered){ $("qFeed").innerHTML=`<span class="no">Pick an answer first.</span>`; return; } if(round.i>=round.queue.length-1) finishRound(); else { round.i++; showQuestion(); } };
+$("qNext").onclick=()=>{ if(!answered){ $("qFeed").innerHTML=`<span class="no">Choose an answer to continue.</span>`; return; } if(round.i>=round.queue.length-1) finishRound(); else { round.i++; showQuestion(); } };
 $("qRestart").onclick=()=>startRound();
 $("qRetry").onclick=()=>{ if(round.missed.length) startRound(round.missed.slice()); };
 $("qNew").onclick=()=>startRound();

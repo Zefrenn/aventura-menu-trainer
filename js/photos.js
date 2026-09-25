@@ -34,11 +34,13 @@ async function loadPhotoIndex() {
   try { const r = await fetch("/api/photo?list=1", { cache: "no-store" }); if (r.ok) PHOTO_IDX = (await r.json()) || {}; } catch (e) {}
   return PHOTO_IDX;
 }
-// photo if we have one, otherwise the drawing (and the drawing is the fallback if the image fails)
+// photo if we have one, otherwise the drawing (the drawing is also the fallback if the image fails).
+// Photos are shown with object-fit:contain so the WHOLE plate/glass is always visible.
 function visual(kind, name, svg, cls, size) {
   const p = photoOf(kind, name);
-  const fb = svg ? `<div class="${cls}${size === "mini" ? " mini" : ""}"${p ? " hidden" : ""}>${svg}</div>` : "";
+  const fb = svg ? `<div class="${cls}${size === "mini" ? " mini" : ""}" data-fb="1"${p ? " hidden" : ""}>${svg}</div>` : "";
   if (!p) return fb;
-  const cap = size ? "" : `<figcaption>${kind === "f" ? "Plate" : "Drink"} photo · ${photoWhen(p)}</figcaption>`;
-  return `<figure class="ph${size ? " ph-" + size : ""}"><img src="${p.url}" alt="${size === "q" ? "" : name}" loading="lazy" decoding="async" onerror="var f=this.parentNode;if(f.nextElementSibling)f.nextElementSibling.hidden=false;f.remove()">${cap}</figure>${fb}`;
+  const alt = size === "q" ? "Photo of the item to identify" : `${name} — ${kind === "f" ? "plate" : "drink"} as served`;
+  const cap = size ? "" : `<div class="phcap">${kind === "f" ? "Plate" : "Drink"} as served · photo ${photoWhen(p)}</div>`;
+  return `<div class="phwrap"><figure class="ph${size ? " ph-" + size : ""}"><img class="bg" src="${p.url}" alt="" aria-hidden="true"><img class="fg" src="${p.url}" alt="${alt}" decoding="async" onerror="var w=this.closest('.phwrap'),d=w.querySelector('[data-fb]');if(d)d.hidden=false;w.querySelectorAll('figure,.phcap').forEach(function(x){x.remove()})"></figure>${cap}${fb}</div>`;
 }

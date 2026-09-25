@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Aventura Trainer — Manager</title><meta name="robots" content="noindex">
 <style>
-  :root{--ink:#f7f1e3;--panel:#fffdf6;--panel2:#fbf3e1;--cream:#2e2422;--gold:#c39a4e;--mute:#8a7a6a;--line:#d8c9ac;--good:#3e4a32;--bad:#9e3b2e;--brick:#9e3b2e;--rose:#a8475a;}
+  :root{--ink:#f7f1e3;--panel:#fffdf6;--panel2:#fbf3e1;--cream:#2e2422;--gold:#c39a4e;--mute:#6b5c4f;--line:#d8c9ac;--good:#3e4a32;--bad:#9e3b2e;--brick:#9e3b2e;--rose:#a8475a;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{margin:0;background:var(--ink);color:var(--cream);font-family:Georgia,'Times New Roman',serif;min-height:100vh;}
   .wrap{max-width:560px;margin:0 auto;padding:20px 16px 48px;}
@@ -99,11 +99,29 @@
 
   .tbl{width:100%;border-collapse:collapse;font-size:14px;} .tbl th{text-align:left;font-family:Helvetica,Arial,sans-serif;font-size:11px;letter-spacing:1px;color:var(--brick);padding:6px 4px;border-bottom:1px solid var(--line);}
   .tbl td{padding:9px 4px;} .tbl td:first-child{min-width:110px;border-bottom:1px solid var(--line);vertical-align:top;} .tbl tr:last-child td{border-bottom:none;}
-  .pct{font-family:Helvetica,Arial,sans-serif;font-weight:700;color:var(--good);} .pct.low{color:var(--brick);} .pct.mid{color:#a0742a;}
+  .pct{font-family:Helvetica,Arial,sans-serif;font-weight:700;color:var(--good);} .pct.low{color:var(--brick);} .pct.mid{color:#8a6420;}
   .mini{font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:var(--mute);}
   .subbars{display:flex;gap:4px;margin-top:4px;} .subbars i{display:block;height:6px;flex:1;border-radius:999px;background:var(--line);position:relative;overflow:hidden;} .subbars i b{position:absolute;left:0;top:0;bottom:0;background:var(--good);}
   .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px;} .kpi .q{text-align:center;padding:12px 8px;} .kpi .big{font-size:30px;}
   .tools{display:flex;gap:8px;margin-bottom:10px;} .tools input{flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-family:Georgia,serif;font-size:15px;color:var(--cream);}
+
+  .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  h2.cat{margin:0 0 8px;} :focus-visible{outline:3px solid #3a6ea5;outline-offset:2px;border-radius:6px;}
+  .cat{font-size:12px;} .mini{font-size:12px;}
+  .kpi4{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;} .kpi4 .q{text-align:center;padding:12px 8px;} .kpi4 .big{font-size:30px;}
+  .tools select{flex:0 0 auto;width:auto;margin:0;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-family:Georgia,serif;font-size:14px;color:var(--cream);}
+  .tbtn{padding:0 16px;border-radius:10px;border:none;font-family:Helvetica,Arial,sans-serif;font-weight:700;cursor:pointer;min-height:44px;background:var(--gold);color:#2e2422;}
+  .charts{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px;}
+  .cwrap{position:relative;height:200px;} .cwrap.sm{height:160px;}
+  button.sort{background:none;border:none;padding:6px 0;font:inherit;color:inherit;letter-spacing:inherit;cursor:pointer;min-height:32px;} button.sort[data-on]::after{content:attr(data-arrow);margin-left:4px;}
+  .modes button{min-height:44px;}
+  .cropbox{max-width:460px;text-align:left;}
+  .stage{position:relative;background:#2e2422;border-radius:10px;overflow:hidden;touch-action:none;user-select:none;display:flex;justify-content:center;}
+  .stage img{display:block;max-width:100%;max-height:52vh;}
+  .cbox{position:absolute;border:3px solid #fff;box-shadow:0 0 0 9999px rgba(0,0,0,.55);border-radius:6px;cursor:move;}
+  .cbox::after{content:"";position:absolute;inset:33% 0;border-top:1px dashed rgba(255,255,255,.6);border-bottom:1px dashed rgba(255,255,255,.6);}
+  .zoom{display:flex;align-items:center;gap:10px;margin-top:10px;font-family:Helvetica,Arial,sans-serif;font-size:13px;font-weight:700;color:var(--cream);} .zoom input{flex:1;min-height:32px;}
+  @media(min-width:760px){ .wrap{max-width:980px;} .kpi4{grid-template-columns:repeat(4,1fr);} .charts{grid-template-columns:1fr 1fr;} .charts .chartbox:first-child{grid-column:1 / -1;} }
   @media(max-width:520px){ .tbl .hide{display:none;} }
   .modes{display:flex;gap:8px;margin:14px 0 12px;}
   .modes button{flex:1;padding:11px 8px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--mute);font-size:14px;font-family:Helvetica,Arial,sans-serif;font-weight:600;cursor:pointer;}
@@ -114,37 +132,62 @@
   .thumb img{width:100%;height:100%;object-fit:cover;display:block;} .thumb svg{width:66px;height:auto;opacity:.55;}
   .pinfo{flex:1;min-width:0;} .pinfo .pn{font-size:15px;} .pinfo .mini{margin-top:2px;}
   .tag{display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:6px;border:1.5px solid;margin-right:4px;}
-  .tag.ok{border-color:#3e7c4f;color:#3e7c4f;} .tag.pending{border-color:#a0742a;color:#a0742a;} .tag.hidden,.tag.none{border-color:var(--line);color:var(--mute);}
+  .tag.ok{border-color:#356b44;color:#356b44;} .tag.pending{border-color:#8a6420;color:#8a6420;} .tag.hidden,.tag.none{border-color:var(--line);color:var(--mute);}
   .pact{display:flex;flex-direction:column;gap:6px;flex:none;}
   .pact button{padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel);font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--cream);}
   .pact button.gold{background:var(--gold);border-color:var(--gold);color:#2e2422;}
   .pact button.warn{color:var(--brick);}
-  .pnote{font-family:Helvetica,Arial,sans-serif;font-size:11.5px;color:#a0742a;margin-top:3px;line-height:1.35;}
+  .pnote{font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#8a6420;margin-top:3px;line-height:1.35;}
   .photosel{display:flex;gap:8px;margin-bottom:10px;} .photosel select,.photosel input{flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);font-family:Georgia,serif;font-size:14px;color:var(--cream);margin:0;}
 </style></head><body>
 <div class="wrap">
   <header><h1>Aventura <span class="mark">❀</span></h1><p>Menu Trainer — Manager board</p></header>
   <div class="gate" id="gate"><div class="box"><div class="cat">MANAGER</div><h2>Enter PIN</h2><input id="pin" inputmode="numeric" type="password" placeholder="PIN" autocomplete="off"><div class="nav" style="margin-top:4px"><button id="go" class="gold">Open board</button></div><div class="sub" id="err" style="margin-top:8px"></div></div></div>
-  <div id="board" class="hidden">
-    <div class="modes"><button id="mTeam" class="on">Team progress</button><button id="mPhotos">Photos</button></div>
-    <div id="photos" class="hidden">
+  <main id="board" class="hidden">
+    <nav class="modes" aria-label="Manager sections"><button id="mTeam" class="on" aria-pressed="true">Team progress</button><button id="mPhotos" aria-pressed="false">Photos</button></nav>
+    <section id="photos" class="hidden" aria-label="Photos">
       <div class="kpi"><div class="q"><div class="cat">FOOD</div><div class="big" id="kPF">0</div></div><div class="q"><div class="cat">DRINKS</div><div class="big" id="kPD">0</div></div><div class="q"><div class="cat">TO CONFIRM</div><div class="big" id="kPP">0</div></div></div>
-      <div class="q" style="margin-bottom:10px"><div class="cat">HOW TO SHOOT</div><div class="mini" style="font-size:12.5px;line-height:1.5;margin-top:4px">Shoot the plate on the pass exactly as it goes to the table — full garnish, correct vessel, top-down or 45°, no hands. Tap <b>Add photo</b> on your phone to use the camera. Photos are resized automatically and show to staff right away, dated with your name.</div></div>
-      <div class="photosel"><select id="pFilter"><option value="need">Needs a photo</option><option value="pending">To confirm</option><option value="have">Has a photo</option><option value="all">Everything</option></select><input id="pBy" placeholder="Your name"></div>
+      <div class="q" style="margin-bottom:10px"><div class="cat">HOW TO SHOOT</div><div class="mini" style="font-size:12.5px;line-height:1.5;margin-top:4px">Shoot it on the pass exactly as it goes out: full garnish, correct plate or glass, 45° angle, no hands. Leave a little space around the edges. After you pick a photo you can frame it — the whole item must stay inside the box. It goes live for staff right away, stamped with your name and the date.</div></div>
+      <div class="photosel"><label class="vh" for="pFilter">Show</label><select id="pFilter"><option value="need">Needs a photo</option><option value="pending">To confirm</option><option value="have">Has a photo</option><option value="all">Everything</option></select><label class="vh" for="pBy">Photo taken by</label><input id="pBy" placeholder="Photo by (your name)"></div>
       <div class="q"><div id="pList"></div></div>
-      <input type="file" id="pFile" accept="image/*" capture="environment" hidden>
-      <div class="counter" id="pMsg"></div>
+      <input type="file" id="pFile" accept="image/*" hidden>
+      <div class="counter" id="pMsg" role="status" aria-live="polite"></div>
+    </section>
+    <section id="team" aria-label="Team progress">
+    <div class="kpi4">
+      <div class="q"><div class="cat">STAFF</div><div class="big" id="kN">0</div><div class="mini" id="kNs">&nbsp;</div></div>
+      <div class="q"><div class="cat">AVG MASTERY</div><div class="big" id="kM">0%</div><div class="mini">of 156 cards</div></div>
+      <div class="q"><div class="cat">ACTIVE · 7 DAYS</div><div class="big" id="kA">0</div><div class="mini" id="kAs">&nbsp;</div></div>
+      <div class="q"><div class="cat">QUIZ ACCURACY</div><div class="big" id="kQ">—</div><div class="mini" id="kQs">&nbsp;</div></div>
     </div>
-    <div id="team">
-    <div class="kpi"><div class="q"><div class="cat">STAFF</div><div class="big" id="kN">0</div></div><div class="q"><div class="cat">AVG MASTERY</div><div class="big" id="kM">0%</div></div><div class="q"><div class="cat">ACTIVE 7D</div><div class="big" id="kA">0</div></div></div>
-    <div class="tools"><input id="search" placeholder="Search name"><button id="refresh" class="gold" style="padding:0 16px;border-radius:10px;border:none;font-family:Helvetica,Arial,sans-serif;font-weight:700;cursor:pointer">Refresh</button></div>
-    <div class="q"><table class="tbl"><thead><tr><th>Name</th><th>Mastery</th><th class="hide">Quiz</th><th>Needs work</th><th class="hide">Last active</th></tr></thead><tbody id="rows"></tbody></table></div>
-    <div class="q" style="margin-top:12px"><div class="cat">SUBJECT KEY</div><div class="mini">Bars under each name, left→right: Drinks · Food · Allergens & Mods · Wines · Resource guide</div></div>
+    <div class="tools">
+      <label class="vh" for="search">Search staff</label><input id="search" placeholder="Search a name">
+      <label class="vh" for="fAct">Show</label><select id="fAct"><option value="all">Everyone</option><option value="7">Active in last 7 days</option><option value="idle">Not active 7+ days</option></select>
+      <button id="refresh" class="gold tbtn">Refresh</button>
+    </div>
+    <div class="charts">
+      <div class="q chartbox"><h2 class="cat">TEAM MASTERY BY SUBJECT</h2><div class="cwrap"><canvas id="cSub" role="img" aria-label="Team mastery by subject"></canvas></div></div>
+      <div class="q chartbox"><h2 class="cat">MOST-MISSED CARDS</h2><div class="cwrap"><canvas id="cMiss" role="img" aria-label="Most-missed cards"></canvas></div><div class="mini" id="missEmpty"></div></div>
+      <div class="q chartbox"><h2 class="cat">WHERE EVERYONE IS</h2><div class="cwrap sm"><canvas id="cDist" role="img" aria-label="Staff by mastery range"></canvas></div></div>
+    </div>
+    <div class="q"><h2 class="cat" style="margin-bottom:6px">EVERYONE</h2><div style="overflow-x:auto"><table class="tbl"><caption class="vh">Staff progress. Select a column heading to sort.</caption><thead><tr>
+      <th scope="col"><button class="sort" data-k="name">Name</button></th><th scope="col"><button class="sort" data-k="pct">Mastery</button></th><th scope="col" class="hide"><button class="sort" data-k="quiz">Quiz</button></th><th scope="col">Needs work</th><th scope="col" class="hide"><button class="sort" data-k="updated">Last active</button></th>
+    </tr></thead><tbody id="rows"></tbody></table></div>
+    <div class="mini" style="margin-top:8px">Bars under each name, left to right: Drinks · Food · Allergens &amp; Mods · Wines · Resource guide</div></div>
     <div class="nav"><button id="csv">Download CSV</button><button id="copy">Copy summary</button></div>
-    <div class="counter">Progress saves when staff study at <span id="host"></span> · PIN is set in Vercel env <code>MANAGER_PIN</code></div>
-    </div>
-  </div>
+    <div class="counter">Staff progress saves automatically at <span id="host"></span>.</div>
+    </section>
+  </main>
 </div>
+<div class="gate hidden" id="crop"><div class="box cropbox" role="dialog" aria-modal="true" aria-labelledby="cropTitle">
+  <h2 id="cropTitle" style="font-size:20px">Frame <span id="cName"></span></h2>
+  <p class="mini" style="font-size:13px;margin:0 0 10px">Drag the box so the <b>whole</b> plate or glass — garnish included — is inside it. Staff see exactly what's in the box.</p>
+  <div class="stage" id="cStage"><img id="cImg" alt="Photo being framed"><div class="cbox" id="cBox" tabindex="0" role="slider" aria-label="Frame position. Use arrow keys to move." aria-valuetext="centered"></div></div>
+  <label class="zoom" for="cZoom">Frame size <input type="range" id="cZoom" min="35" max="100" value="100"></label>
+  <div class="nav" style="margin-top:8px"><button id="cRot">Rotate ⟳</button><button id="cWhole">Whole photo</button></div>
+  <div class="nav"><button id="cCancel">Cancel</button><button id="cSave" class="gold">Save photo</button></div>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
 <script src="/js/illus.js"></script>
 <script src="/js/drinks.js"></script>
 <script src="/js/food.js"></script>
@@ -158,24 +201,62 @@ function ago(t){ if(!t) return "—"; const d=(Date.now()-t)/36e5; if(d<1) retur
 async function load(){
   $("err").textContent="";
   const r=await fetch("/api/progress?all=1",{cache:"no-store",headers:{"x-pin":pin}});
-  if(r.status===401){ $("err").textContent="Wrong PIN."; sessionStorage.removeItem("av_pin"); return false; }
+  if(r.status===401){ $("err").textContent="That PIN didn't work. Check it and try again."; sessionStorage.removeItem("av_pin"); return false; }
   if(!r.ok){ $("err").textContent="Could not load ("+r.status+")."; return false; }
   rows=(await r.json()).sort((a,b)=>(b.summary?.pct||0)-(a.summary?.pct||0)); sessionStorage.setItem("av_pin",pin);
   $("gate").classList.add("hidden"); $("board").classList.remove("hidden"); render(); return true;
 }
+// ================= TEAM DASHBOARD =================
+const SUBSHORT={"Drinks":"Drinks","Food":"Food","Allergens & Mods":"Allergens","Wines by the glass":"Wines","Resource guide":"Guide"};
+const C={brick:"#9e3b2e",gold:"#c39a4e",olive:"#3e4a32",rose:"#a8475a",line:"#d8c9ac",ink:"#2e2422",mute:"#6b5c4f"};
+let charts={}, sortK="pct", sortDir=-1;
+const qpct=r=>{const q=r.summary&&r.summary.quiz; return q&&q.total?Math.round(100*q.right/q.total):null;};
+function visibleRows(){
+  const q=$("search").value.trim().toLowerCase(), f=$("fAct").value, wk=7*864e5;
+  return rows.filter(r=>(!q||r.name.toLowerCase().includes(q))&&(f==="all"||(f==="7"&&r.updated&&Date.now()-r.updated<wk)||(f==="idle"&&(!r.updated||Date.now()-r.updated>=wk))));
+}
+function mkChart(id,cfg){ if(typeof Chart==="undefined") return; if(charts[id]) charts[id].destroy(); charts[id]=new Chart($(id),cfg); }
+const baseOpts=(fmt)=>({responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.x??c.parsed.y)}}},
+  scales:{x:{grid:{display:false},ticks:{color:C.mute,font:{family:"Helvetica"}}},y:{grid:{color:"#eadfca"},ticks:{color:C.mute,font:{family:"Helvetica"}}}}});
 function render(){
-  const q=$("search").value.trim().toLowerCase(); const vis=rows.filter(r=>!q||r.name.toLowerCase().includes(q));
-  $("kN").textContent=rows.length; $("kM").textContent=(rows.length?Math.round(rows.reduce((a,r)=>a+(r.summary?.pct||0),0)/rows.length):0)+"%";
-  $("kA").textContent=rows.filter(r=>r.updated&&Date.now()-r.updated<7*864e5).length;
-  $("rows").innerHTML=""; 
-  vis.forEach(r=>{ const s=r.summary||{pct:0,bySub:{},weak:[],quiz:{right:0,total:0}}; const tr=document.createElement("tr");
-    const p=s.pct||0; const cls=p>=80?"":p>=40?"mid":"low"; const qz=s.quiz&&s.quiz.total?Math.round(100*s.quiz.right/s.quiz.total)+"% ("+s.quiz.total+")":"—";
+  const vis=visibleRows(), all=rows, wk=7*864e5;
+  // KPIs (whole team)
+  const act=all.filter(r=>r.updated&&Date.now()-r.updated<wk).length;
+  const qs=all.reduce((a,r)=>{const q=r.summary&&r.summary.quiz; if(q){a.r+=q.right||0;a.t+=q.total||0;} return a;},{r:0,t:0});
+  $("kN").textContent=all.length; $("kNs").textContent=all.length===1?"trainee":"trainees";
+  $("kM").textContent=(all.length?Math.round(all.reduce((a,r)=>a+(r.summary?.pct||0),0)/all.length):0)+"%";
+  $("kA").textContent=act; $("kAs").textContent=all.length?`of ${all.length}`:"";
+  $("kQ").textContent=qs.t?Math.round(100*qs.r/qs.t)+"%":"—"; $("kQs").textContent=qs.t?`${qs.t} answers`:"no quiz answers yet";
+  // charts (filtered view)
+  const subs=SUBS.map(k=>{ let m=0,t=0; vis.forEach(r=>{const b=r.summary&&r.summary.bySub&&r.summary.bySub[k]; if(b){m+=b.m;t+=b.t;}}); return t?Math.round(100*m/t):0; });
+  mkChart("cSub",{type:"bar",data:{labels:SUBS.map(k=>SUBSHORT[k]),datasets:[{data:subs,backgroundColor:[C.brick,C.gold,C.rose,C.olive,C.mute],borderRadius:5}]},
+    options:{...baseOpts(v=>v+"% mastered"),indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:"#eadfca"},ticks:{callback:v=>v+"%",color:C.mute}},y:{grid:{display:false},ticks:{color:C.ink,font:{family:"Helvetica",weight:"bold"}}}}}});
+  $("cSub").setAttribute("aria-label","Team mastery by subject: "+SUBS.map((k,i)=>SUBSHORT[k]+" "+subs[i]+"%").join(", "));
+  const miss={}; vis.forEach(r=>(r.summary?.weak||[]).forEach(n=>miss[n]=(miss[n]||0)+1));
+  const top=Object.entries(miss).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  $("missEmpty").textContent=top.length?"":"Nothing flagged yet — this fills in as staff take quizzes.";
+  mkChart("cMiss",{type:"bar",data:{labels:top.map(x=>x[0].length>22?x[0].slice(0,21)+"…":x[0]),datasets:[{data:top.map(x=>x[1]),backgroundColor:C.brick,borderRadius:5}]},
+    options:{...baseOpts(v=>v+(v===1?" person":" people")),indexAxis:"y",scales:{x:{beginAtZero:true,ticks:{precision:0,color:C.mute},grid:{color:"#eadfca"}},y:{grid:{display:false},ticks:{color:C.ink}}}}});
+  $("cMiss").setAttribute("aria-label","Most-missed cards: "+(top.length?top.map(x=>`${x[0]} (${x[1]})`).join(", "):"none yet"));
+  const bins=[0,0,0,0]; vis.forEach(r=>{const p=r.summary?.pct||0; bins[p>=75?3:p>=50?2:p>=25?1:0]++;});
+  mkChart("cDist",{type:"bar",data:{labels:["0–24%","25–49%","50–74%","75–100%"],datasets:[{data:bins,backgroundColor:[C.line,C.gold,C.rose,C.olive],borderRadius:5}]},
+    options:{...baseOpts(v=>v+(v===1?" person":" people")),scales:{y:{beginAtZero:true,ticks:{precision:0,color:C.mute},grid:{color:"#eadfca"}},x:{grid:{display:false},ticks:{color:C.ink}}}}});
+  $("cDist").setAttribute("aria-label","Staff by mastery range: "+["0–24%","25–49%","50–74%","75–100%"].map((l,i)=>`${l}: ${bins[i]}`).join(", "));
+  // table
+  const key=r=>sortK==="name"?r.name.toLowerCase():sortK==="quiz"?(qpct(r)??-1):sortK==="updated"?(r.updated||0):(r.summary?.pct||0);
+  const sorted=[...vis].sort((a,b)=>{const x=key(a),y=key(b); return (x<y?-1:x>y?1:0)*sortDir;});
+  document.querySelectorAll("button.sort").forEach(bt=>{ const on=bt.dataset.k===sortK; bt.closest("th").setAttribute("aria-sort",on?(sortDir>0?"ascending":"descending"):"none"); if(on){bt.dataset.on="1";bt.dataset.arrow=sortDir>0?"▲":"▼";} else {delete bt.dataset.on;} });
+  $("rows").innerHTML="";
+  sorted.forEach(r=>{ const s=r.summary||{pct:0,bySub:{},weak:[],quiz:{right:0,total:0}}; const tr=document.createElement("tr");
+    const p=s.pct||0, cls=p>=80?"":p>=40?"mid":"low", q=qpct(r);
     const bars=SUBS.map(k=>{const b=s.bySub&&s.bySub[k]; const w=b&&b.t?Math.round(100*b.m/b.t):0; return `<i title="${k}: ${w}%"><b style="width:${w}%"></b></i>`;}).join("");
-    tr.innerHTML=`<td><div class="name-cell"></div><div class="subbars">${bars}</div></td><td><span class="pct ${cls}">${p}%</span><div class="mini">${s.mastered||0}/${s.total||0}</div></td><td class="hide">${qz}</td><td class="mini weakcell"></td><td class="hide mini">${ago(r.updated)}</td>`;
+    tr.innerHTML=`<td><div class="name-cell"></div><div class="subbars" aria-hidden="true">${bars}</div></td><td><span class="pct ${cls}">${p}%</span><div class="mini">${s.mastered||0}/${s.total||0}</div></td><td class="hide">${q===null?"—":q+"% <span class='mini'>("+s.quiz.total+")</span>"}</td><td class="mini weakcell"></td><td class="hide mini">${ago(r.updated)}</td>`;
     tr.querySelector(".name-cell").textContent=r.name; tr.querySelector(".weakcell").textContent=(s.weak||[]).slice(0,4).join(", ")||"—";
     $("rows").appendChild(tr); });
-  if(!vis.length) $("rows").innerHTML=`<tr><td colspan="5" class="mini">No trainees yet. Progress appears here once someone enters a name and studies.</td></tr>`;
+  if(!sorted.length) $("rows").innerHTML=rows.length?`<tr><td colspan="5" class="mini">No one matches that search or filter.</td></tr>`:`<tr><td colspan="5" class="mini">No one has studied yet. Share <b>${location.host}</b> with staff — they show up here after their first card.</td></tr>`;
 }
+document.querySelectorAll("button.sort").forEach(bt=>bt.onclick=()=>{ if(sortK===bt.dataset.k) sortDir*=-1; else { sortK=bt.dataset.k; sortDir=sortK==="name"?1:-1; } render(); });
+$("fAct").onchange=render;
 $("go").onclick=()=>{ pin=$("pin").value.trim(); load(); }; $("pin").onkeydown=e=>{ if(e.key==="Enter") $("go").click(); };
 $("refresh").onclick=load; $("search").oninput=render;
 $("csv").onclick=()=>{ const esc=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
@@ -189,7 +270,7 @@ const PITEMS=[...FOOD.map(f=>({kind:"f",name:f.name,cat:f.cat,svg:FOODILLUS[f.il
 let pTarget=null;
 $("pBy").value=localStorage.getItem("av_photo_by")||"";
 $("pBy").oninput=()=>localStorage.setItem("av_photo_by",$("pBy").value.trim());
-function setMode(m){ $("mTeam").classList.toggle("on",m==="team"); $("mPhotos").classList.toggle("on",m==="photos");
+function setMode(m){ $("mTeam").classList.toggle("on",m==="team"); $("mPhotos").classList.toggle("on",m==="photos"); $("mTeam").setAttribute("aria-pressed",m==="team"); $("mPhotos").setAttribute("aria-pressed",m==="photos");
   $("team").classList.toggle("hidden",m!=="team"); $("photos").classList.toggle("hidden",m!=="photos"); if(m==="photos") loadPhotos(); }
 $("mTeam").onclick=()=>setMode("team"); $("mPhotos").onclick=()=>setMode("photos");
 async function loadPhotos(){ $("pMsg").textContent="Loading…"; await loadPhotoIndex(); $("pMsg").textContent=""; renderPhotos(); }
@@ -222,20 +303,51 @@ async function pPost(body,okMsg){
   try{ const r=await fetch("/api/photo",{method:"POST",headers:{"Content-Type":"application/json","x-pin":pin},body:JSON.stringify(body)});
     const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error(j.error||r.status);
     $("pMsg").textContent=okMsg+" ✓"; await loadPhotoIndex(); renderPhotos();
-  }catch(e){ $("pMsg").textContent="Couldn't save: "+e.message; }
+  }catch(e){ $("pMsg").textContent="Couldn't save ("+e.message+"). Check your connection and try again."; }
 }
 function setStatus(it,status,note){ const b={action:"status",id:photoId(it.kind,it.name),status}; if(note!==undefined) b.note=note; pPost(b,it.name+" → "+status); }
-async function shrink(file){
-  let img=null; try{ img=await createImageBitmap(file,{imageOrientation:"from-image"}); }catch(e){}
-  if(!img) img=await new Promise((res,rej)=>{const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error("unreadable image")); i.src=URL.createObjectURL(file);});
-  const W=img.width,H=img.height,k=Math.min(1,1080/Math.max(W,H)); const c=document.createElement("canvas"); c.width=Math.round(W*k); c.height=Math.round(H*k);
-  c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+// ---------- photo framing (crop) ----------
+let cSrc=null, cRot=0, cFrame={x:0,y:0,w:1,h:1}; // frame in 0..1 of the rotated image
+function rotated(img,deg){ const c=document.createElement("canvas"), r=deg%180!==0; c.width=r?img.height:img.width; c.height=r?img.width:img.height;
+  const x=c.getContext("2d"); x.translate(c.width/2,c.height/2); x.rotate(deg*Math.PI/180); x.drawImage(img,-img.width/2,-img.height/2); return c; }
+async function loadImg(file){ try{ return await createImageBitmap(file,{imageOrientation:"from-image"}); }catch(e){}
+  return await new Promise((res,rej)=>{const i=new Image(); i.onload=()=>res(i); i.onerror=()=>rej(new Error("that file isn't a readable image")); i.src=URL.createObjectURL(file);}); }
+function showCrop(){ const c=rotated(cSrc,cRot); $("cImg").src=c.toDataURL("image/jpeg",0.8); $("cImg").onload=()=>{ setZoom(); }; }
+function setZoom(){ const z=$("cZoom").value/100, img=$("cImg"), W=img.naturalWidth, H=img.naturalHeight;
+  // 4:3 frame (matches the trainer), sized as a fraction of the largest 4:3 box that fits
+  let fw=W, fh=W*3/4; if(fh>H){ fh=H; fw=H*4/3; } if(z>=1 && $("cZoom").dataset.whole==="1"){ fw=W; fh=H; }
+  fw*=z; fh*=z; const cx=(cFrame.x+cFrame.w/2)*W||W/2, cy=(cFrame.y+cFrame.h/2)*H||H/2;
+  cFrame={w:fw/W,h:fh/H,x:0,y:0}; placeFrame(cx/W-cFrame.w/2, cy/H-cFrame.h/2); }
+function placeFrame(x,y){ cFrame.x=Math.min(Math.max(0,x),1-cFrame.w); cFrame.y=Math.min(Math.max(0,y),1-cFrame.h);
+  const img=$("cImg"), st=$("cStage"), ox=img.offsetLeft, oy=img.offsetTop, w=img.clientWidth, h=img.clientHeight, b=$("cBox");
+  b.style.left=(ox+cFrame.x*w)+"px"; b.style.top=(oy+cFrame.y*h)+"px"; b.style.width=(cFrame.w*w)+"px"; b.style.height=(cFrame.h*h)+"px";
+  b.setAttribute("aria-valuetext",`frame ${Math.round(cFrame.w*100)}% wide, ${Math.round(cFrame.x*100)}% from left, ${Math.round(cFrame.y*100)}% from top`); }
+(function(){ const b=$("cBox"); let st=null;
+  b.onpointerdown=e=>{ st={sx:e.clientX,sy:e.clientY,x:cFrame.x,y:cFrame.y}; b.setPointerCapture(e.pointerId); };
+  b.onpointermove=e=>{ if(!st) return; const img=$("cImg"); placeFrame(st.x+(e.clientX-st.sx)/img.clientWidth, st.y+(e.clientY-st.sy)/img.clientHeight); };
+  b.onpointerup=b.onpointercancel=()=>{ st=null; };
+  b.onkeydown=e=>{ const d=e.shiftKey?0.05:0.01, m={ArrowLeft:[-d,0],ArrowRight:[d,0],ArrowUp:[0,-d],ArrowDown:[0,d]}[e.key]; if(m){ e.preventDefault(); placeFrame(cFrame.x+m[0],cFrame.y+m[1]); } };
+})();
+$("cZoom").oninput=()=>{ $("cZoom").dataset.whole="0"; setZoom(); };
+$("cWhole").onclick=()=>{ $("cZoom").value=100; $("cZoom").dataset.whole="1"; cFrame={x:0,y:0,w:1,h:1}; setZoom(); };
+$("cRot").onclick=()=>{ cRot=(cRot+90)%360; cFrame={x:0,y:0,w:1,h:1}; showCrop(); };
+function closeCrop(){ $("crop").classList.add("hidden"); cSrc=null; if(pLast) pLast.focus(); }
+$("cCancel").onclick=()=>{ closeCrop(); $("pMsg").textContent="Photo not saved."; };
+$("crop").onkeydown=e=>{ if(e.key==="Escape") $("cCancel").click(); };
+$("cSave").onclick=async()=>{ const it=pTarget; if(!cSrc||!it) return;
+  const full=rotated(cSrc,cRot), sx=cFrame.x*full.width, sy=cFrame.y*full.height, sw=cFrame.w*full.width, sh=cFrame.h*full.height;
+  const k=Math.min(1,1080/Math.max(sw,sh)), c=document.createElement("canvas"); c.width=Math.round(sw*k); c.height=Math.round(sh*k);
+  c.getContext("2d").drawImage(full,sx,sy,sw,sh,0,0,c.width,c.height);
   let type="image/webp", url=c.toDataURL(type,0.82); if(!url.startsWith("data:image/webp")){ type="image/jpeg"; url=c.toDataURL(type,0.85); }
-  return {type,data:url.split(",")[1]};
-}
+  closeCrop();
+  await pPost({action:"upload",id:photoId(it.kind,it.name),type,data:url.split(",")[1],by:$("pBy").value.trim()||"Manager"},"Saved "+it.name);
+};
+let pLast=null;
 $("pFile").onchange=async()=>{ const file=$("pFile").files[0], it=pTarget; if(!file||!it) return;
-  try{ $("pMsg").textContent="Resizing…"; const im=await shrink(file);
-    await pPost({action:"upload",id:photoId(it.kind,it.name),type:im.type,data:im.data,by:$("pBy").value.trim()||"Manager"},"Saved "+it.name);
-  }catch(e){ $("pMsg").textContent="Couldn't use that image: "+e.message; } };
+  try{ $("pMsg").textContent="Opening photo…"; cSrc=await loadImg(file); cRot=0; cFrame={x:0,y:0,w:1,h:1};
+    $("cName").textContent=it.name; $("cZoom").value=100; $("cZoom").dataset.whole="1"; pLast=document.activeElement;
+    $("crop").classList.remove("hidden"); showCrop(); $("pMsg").textContent=""; setTimeout(()=>$("cBox").focus(),60);
+  }catch(e){ $("pMsg").textContent="Couldn't open that photo — "+e.message+". Try a JPG or PNG."; } };
+window.addEventListener("resize",()=>{ if(!$("crop").classList.contains("hidden")) placeFrame(cFrame.x,cFrame.y); });
 if(pin) load();
 </script></body></html>

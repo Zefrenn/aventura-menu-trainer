@@ -34,3 +34,9 @@ Env vars: `BLOB_READ_WRITE_TOKEN` (from the Blob store), `MANAGER_PIN`.
 - **Skip**: the Next button reads *Skip* until you answer. Skipped questions are listed on the results screen and included in the retry.
 - **Retry missed** now re-asks the exact questions you missed or skipped (before, it asked a new random question about the same items). The round in progress is saved per trainee, so a reload or the phone closing the tab doesn't lose it.
 - **Pronunciation**: *Escuchar · Hear it* on every drink, dish and wine uses the phone's built-in Spanish voice (`js/speak.js`). Tap twice for slow. No audio files.
+
+## v4.3 (Sep 2026) — hints written for new staff
+
+- Every quiz hint is now written against the Aventura menu for someone with no restaurant background (`js/coach.js`): Spanish word clues for dish names ("pulpo" = octopus), plain-English glass guides, garnish and build nudges, batch-tape memory tricks, allergen "triggers" pulled from each dish's ingredients (baguette → gluten, aioli → egg), where each allergen hides on our menu, and a written hint for every guide and allergen card.
+- After each question, a **Remember it** line gives the one sentence worth keeping about that dish, drink or wine. The full details sit underneath in small print.
+- Hints never state the answer: a check runs every question type against every card (632 questions, 0 leaks).

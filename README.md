@@ -17,3 +17,10 @@ Env vars: `BLOB_READ_WRITE_TOKEN` (from the Blob store), `MANAGER_PIN`.
 - Section picker is a bottom sheet with card counts; new sections: Happy Hour, Vino de Postre, Menu Basics.
 - Data reconciled to the printed menus: Dinner 9·11·26, Sweet Tapas 6·24·26, Happy Hour 8·1·26 (`js/drinks.js`, `js/guide.js`, `js/food.js`, `js/diet.js`, `js/allergy.js`). Diet codes follow the printed key (V = vegetarian, VG = vegan).
 - Menu date stamps live in the header; update them when a new menu prints.
+
+## v4.1 (Sep 2026) — manager board UX
+
+- Manager board restyled to the same brand tokens as the trainer (pill nav with counts, paper cards, rose accents); script moved to `js/manager.js`.
+- Every dropdown has a leading icon and a chevron so it reads as a menu; active filters highlight in rose; search fields have a clear button.
+- **Team**: filter by activity and mastery level (80%+, 40–79%, under 40%, weak cards); result count; sortable headers with sort-direction icons; tap any row to expand a per-person breakdown (subject bars, quiz, started / last active, all weak cards, one-tap copy). Expand / collapse all.
+- **Photos**: search, status + category filters, items grouped by menu category in collapsible groups with live-photo counts; KPI tiles tap to filter; icons on every action; toast messages instead of an inline status line.

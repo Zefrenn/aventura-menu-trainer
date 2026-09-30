@@ -126,7 +126,9 @@ header .menus{margin:3px 0 0;font-size:13.5px;color:var(--gray-3);font-style:ita
 .menuline{font-size:14.5px;color:var(--gray-3);font-style:italic;margin-top:12px;line-height:1.4;padding-top:10px;border-top:1px solid var(--line);}
 details.ing{margin-top:12px;border-top:1px solid var(--line);padding-top:8px;}
 details.ing summary{cursor:pointer;font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--rose-deep);min-height:32px;display:flex;align-items:center;list-style:none;}
-details.ing summary::-webkit-details-marker{display:none;} details.ing summary::after{content:"+";margin-left:auto;font-size:16px;} details[open].ing summary::after{content:"–";}
+details.ing summary::-webkit-details-marker{display:none;}
+details.ing summary::after{content:"";margin-left:auto;width:16px;height:16px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/contain no-repeat;transition:transform .2s var(--ease);}
+details[open].ing summary::after{transform:rotate(180deg);}
 details.ing p{margin:4px 0 0;font-size:15px;line-height:1.5;}
 .chips{display:flex;gap:6px;margin-top:12px;align-items:center;}
 .chip{width:16px;height:16px;border-radius:50%;border:1px solid var(--line-2);flex:none;}

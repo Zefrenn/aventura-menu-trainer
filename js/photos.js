@@ -11,6 +11,17 @@ const PHOTO_SEED = {
                           note: "Kaffir leaf on the king cube; dehydrated piña not in shot." },
   "d-el-parque":        { src: SEED_IMG["d-el-parque"],        at: "Sep 2026", by: "Zefren", status: "pending",
                           note: "Tulip, pale gold, green wheel — looks like El Parque. Confirm before staff see it." },
+  // plates shot on the pass, Sep 2026 (static files in /img, so they don't bloat the page)
+  "f-tortilla-espanola":       { src: "/img/p-f-tortilla-espanola.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-sardinas":                { src: "/img/p-f-sardinas.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-tarta-de-queso":          { src: "/img/p-f-tarta-de-queso.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-flor-de-alcachofa":       { src: "/img/p-f-flor-de-alcachofa.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-gambas":                  { src: "/img/p-f-gambas.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-pepa-en-adobo":           { src: "/img/p-f-pepa-en-adobo.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-marinera-fideua":         { src: "/img/p-f-marinera-fideua.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-primavera":               { src: "/img/p-f-primavera.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-pimientos-de-padron":     { src: "/img/p-f-pimientos-de-padron.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
+  "f-bunuelos-de-bacalao":     { src: "/img/p-f-bunuelos-de-bacalao.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
 };
 let PHOTO_IDX = {};
 // Dishes renamed for the 9/11 menu — photos already uploaded under the old id keep working.

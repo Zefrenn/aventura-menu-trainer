@@ -302,7 +302,6 @@ const lo=nums[Math.floor(nums.length/3)], hi=nums[Math.ceil(2*nums.length/3)-1];
 const pos=x<=lo?"one of the lower-priced ones":x>=hi?"one of the pricier ones":"right in the middle";
 return `${esc(label)} run ${money(nums[0])}–${money(nums[nums.length-1])}. This one is ${pos}.`; }
 function glassUse(g){ const k=GLASS.find(x=>String(g).toLowerCase().startsWith(x[0].toLowerCase())); return k?k[1]:null; }
-const HIDES=[[/gluten|wheat/,"bread and baguette, flour, breading and fried batter, fideos, shoyu"],[/dairy|milk/,"cheese, butter, cream and milk"],[/egg/,"aioli and mayo, tortilla, custards and batters"],[/shellfish|crustacean/,"gambas, prawns and shellfish stock"],[/mollusk/,"pulpo, squid, clams and mussels"],[/fish/,"anchovies (including anchovy aioli), tuna, sardines, bacalao"],[/nut/,"almonds, marcona, pistachio"],[/soy/,"shoyu and soy sauce"],[/sesame/,"sesame seeds and tahini"],[/pork/,"jamón, chorizo, pork belly and pork gelatin"],[/mustard|dijon/,"dijon and vinaigrettes"]];
 const DIETHINT={V:"Vegetarian means no meat or fish. Watch for anchovy, jamón and gelatin.",VG:"Vegan means no meat, fish, dairy, egg or honey. Aioli and cheese are the usual traps.",GF:"Gluten-free as printed means no bread, flour, breading, fideos or shoyu.",DF:"Dairy-free means no cheese, butter, cream or milk."};
 function shapeHint(ans){ const w=String(ans).trim().split(/\s+/);
 return w.length>4?`It begins “${esc(w.slice(0,2).join(" "))} …”`:`The answer is ${w.length} word${w.length>1?"s":""} and starts with “${esc(String(ans).trim().charAt(0).toUpperCase())}”.`; }
@@ -317,83 +316,86 @@ return shapeHint(f.a);
 function makeQuestion(c){
 let q;
 if(c.kind==="drink"){
-const d=c.d, all=DRINKS, use=glassUse(d.glass);
+const d=c.d, all=DRINKS, use=glassUse(d.glass), K=COACH.drink[d.name]||{};
 const types=[
 ()=>({prompt:`What glass does <b>${esc(d.name)}</b> go in?`,answer:d.glass,opts:distractors(d.glass,all.map(x=>x.glass)),vis:"after",
-hint:use?`The right glass is the one the bar uses for <i>${esc(use.toLowerCase())}</i>.`:`Think about how it's served: up, on ice, or long.`}),
+hint:K.glass?esc(K.glass):use?`The right glass is the one the bar uses for <i>${esc(use.toLowerCase())}</i>.`:`Think about how it's served: up, on ice, or long.`}),
 ()=>({prompt:`Which drink is this?<br><i>"${esc(d.menu)}"</i>`,answer:d.name,opts:distractors(d.name,all.map(x=>x.name)),vis:"q",
-hint:`${esc(d.cat)} · ${esc(d.price)} · ${nameShape(d.name)}`}),
+hint:K.id?esc(K.id):`${esc(d.cat)} · ${esc(d.price)} · ${nameShape(d.name)}`}),
 ];
 if(d.cat!=="Sangria"){
 types.push(()=>({prompt:`What's the garnish on <b>${esc(d.name)}</b>?`,answer:d.garnish,opts:distractors(d.garnish,all.map(x=>x.garnish).filter(g=>!/confirm/i.test(g))),vis:"after",
-hint:`Garnishes usually echo what's in the glass: <i>${esc(d.menu)}</i>.`}));
+hint:K.garnish?esc(K.garnish):`Garnishes usually echo what's in the glass: <i>${esc(d.menu)}</i>.`}));
 types.push(()=>{ const ans=d.build.join(" · "), opts=distractors(ans,all.filter(x=>x.cat!=="Sangria").map(x=>x.build.join(" · ")));
 const step=d.build.find(s=>!opts.some(o=>o.includes(s)))||d.build[0];
-return {prompt:`What's the build for <b>${esc(d.name)}</b>?`,answer:ans,opts,vis:"q",hint:`One of the steps is <b>${esc(step)}</b>.`}; });
+return {prompt:`What's the build for <b>${esc(d.name)}</b>?`,answer:ans,opts,vis:"q",hint:K.build?esc(K.build)+" (“Batch” = the pre-mixed base in the taped bottle.)":`One of the steps is <b>${esc(step)}</b>.`}; });
 }
 if(d.colors.length) types.push(()=>({prompt:`Batch bottle color for <b>${esc(d.name)}</b>?`,answer:d.colors.join(" + "),opts:distractors(d.colors.join(" + "),all.filter(x=>x.colors.length).map(x=>x.colors.join(" + "))),vis:"q",elim:1,
-hint:`${d.colors.length===1?"A single tape color":"Two tape colors"}. One wrong answer is crossed out.`}));
+hint:`${K.tape?esc(K.tape)+" ":""}${d.colors.length===1?"A single tape color":"Two tape colors"}. One wrong answer is crossed out.`}));
 if(photoOf("d",d.name)){ const pq=()=>({prompt:`Which drink is this?`,answer:d.name,opts:distractors(d.name,all.filter(x=>x.glass.split(" ")[0]===d.glass.split(" ")[0]).map(x=>x.name),3,all.map(x=>x.name)),vis:"id",
-hint:`${esc(d.cat)} · <i>${esc(d.menu)}</i>`}); types.push(pq,pq); }
+hint:K.id?esc(K.id):`${esc(d.cat)} · <i>${esc(d.menu)}</i>`}); types.push(pq,pq); }
 else if(ILLUS[d.name]) types.push(()=>({prompt:`Which drink is served like this?`,answer:d.name,opts:distractors(d.name,all.map(x=>x.name)),vis:"illus",
-hint:`${esc(d.cat)} · ${nameShape(d.name)}`}));
+hint:K.id?esc(K.id):`${esc(d.cat)} · ${nameShape(d.name)}`}));
 q=pick(types)(); q.explain=`${d.name}: ${d.glass} · ${d.build.join(" · ")} · garnish ${d.garnish}.`;
 } else if(c.kind==="food"){
-const f=c.fd, all=FOOD, major=f.all.split("·")[0].split(",").map(a=>a.trim()).filter(a=>MAJOR.test(a));
+const f=c.fd, all=FOOD, K=COACH.food[f.name]||{}, major=f.all.split("·")[0].split(",").map(a=>a.trim()).filter(a=>MAJOR.test(a));
 const types=[
 ()=>({prompt:`Which dish is this?<br><i>“${esc(f.drop)}”</i>`,answer:f.name,opts:distractors(f.name,all.map(x=>x.name)),vis:"q",
-hint:`${esc(f.cat)} · ${esc(money(f.price))} · ${nameShape(f.name)}`}),
+hint:K.id?esc(K.id):`${esc(f.cat)} · ${esc(money(f.price))} · ${nameShape(f.name)}`}),
 ()=>({prompt:`Allergens in <b>${esc(f.name)}</b>?`,answer:f.all,opts:distractors(f.all,all.map(x=>x.all)),vis:"q",
-hint:`Work from the ingredients: <i>${esc(trunc(f.ing,150))}</i>`}),
+hint:esc(COACH.allergenHint(f))}),
 ()=>({prompt:`Dinner-menu price of <b>${esc(f.name)}</b>?`,answer:f.price,opts:distractors(f.price,all.filter(x=>x.cat===f.cat).map(x=>x.price),3,all.map(x=>x.price)),vis:"q",elim:1,
 hint:priceHint(f.price,all.filter(x=>x.cat===f.cat).map(x=>x.price),f.cat)+" One wrong answer is crossed out."}),
 ];
 if(photoOf("f",f.name)){ const pq=()=>({prompt:`Which dish is this?`,answer:f.name,opts:distractors(f.name,all.filter(x=>x.cat===f.cat).map(x=>x.name),3,all.map(x=>x.name)),vis:"id",
-hint:`${esc(f.cat)} · ${nameShape(f.name)}`}); types.push(pq,pq); }
+hint:K.id?esc(K.id):`${esc(f.cat)} · ${nameShape(f.name)}`}); types.push(pq,pq); }
 else types.push(()=>({prompt:`Which dish is served like this?`,answer:f.name,opts:distractors(f.name,all.filter(x=>x.ill===f.ill).map(x=>x.name),3,all.map(x=>x.name)),vis:"illus",
-hint:`${esc(f.cat)} · ${esc(money(f.price))} · ${nameShape(f.name)}`}));
+hint:K.id?esc(K.id):`${esc(f.cat)} · ${esc(money(f.price))} · ${nameShape(f.name)}`}));
 if(f.mods!=="None") types.push(()=>({prompt:`Approved mods for <b>${esc(f.name)}</b>?`,answer:f.mods,opts:distractors(f.mods,all.filter(x=>x.mods!=="None").map(x=>x.mods)),vis:"q",
-hint:major.length?`A mod usually takes out an allergen. This dish has: ${esc(major.join(", "))}.`:`Think about what a guest would most often ask to leave off.`}));
+hint:K.mods?esc(K.mods):major.length?`A mod usually takes out an allergen. This dish has: ${esc(major.join(", "))}.`:`Think about what a guest would most often ask to leave off.`}));
 if(!/^None/.test(f.ut)) types.push(()=>({prompt:`What drops with <b>${esc(f.name)}</b>?`,answer:f.ut,opts:distractors(f.ut,all.map(x=>x.ut)),vis:"q",
-hint:`Picture how it's eaten: <i>“${esc(f.drop)}”</i>`}));
+hint:K.ut?esc(K.ut):`Picture how it's eaten: <i>“${esc(f.drop)}”</i>`}));
 if(f.pair) types.push(()=>({prompt:`Printed dessert-wine pairing for <b>${esc(f.name)}</b>?`,answer:f.pair,opts:distractors(f.pair,all.filter(x=>x.pair).map(x=>x.pair)),vis:"q",
-hint:`Match the sweetness and weight of the dessert: <i>“${esc(f.drop)}”</i>`}));
+hint:K.pair?esc(K.pair):`Match the sweetness and weight of the dessert: <i>“${esc(f.drop)}”</i>`}));
 // scenario: guest allergy — which dish is SAFE
 if(major.length){
 const w=pick(major); const key=w.replace(/\s*\(.*\)/,"").toLowerCase();
 const safe=all.filter(x=>!x.all.toLowerCase().includes(key.split(" ")[0]));
 const unsafe=all.filter(x=>x!==f && x.all.toLowerCase().includes(key.split(" ")[0]));
-const hides=(HIDES.find(h=>h[0].test(key))||[0,null])[1];
+const hid=COACH.hides.find(h=>h[0].test(key));
 if(safe.length&&unsafe.length>=2) types.push(()=>{const ans=pick(safe).name;return {prompt:`A guest has a <b>${esc(key)}</b> allergy. Which of these can they order?`,answer:ans,opts:distractors(ans,[f.name,...shuffleArr(unsafe).slice(0,2).map(x=>x.name)]),vis:null,
-hint:hides?`${esc(key.charAt(0).toUpperCase()+key.slice(1))} usually hides in ${esc(hides)}. Three of these have it.`:`Three of these contain ${esc(key)}. Think through each dish's ingredients.`};});
+hint:hid?`Where ${esc(hid[1])} hides on our menu: ${esc(hid[2])}. Three of these have it. At the table, never guess — ask Chef.`:`Three of these contain ${esc(key)}. Think through each dish's ingredients.`};});
 }
 // scenario: dietary restriction — which dish is safe as printed
 ["V","VG","GF","DF"].forEach(code=>{
 const has=x=>(DIET[x.name]||[]).includes(code);
 if(!has(f)) return;
 const bad=all.filter(x=>!(DIET[x.name]||[]).some(t=>t.replace("*","")===code));
-if(bad.length>=3) types.push(()=>({prompt:`A guest is <b>${DIETNAME[code].toLowerCase()}</b>. Which of these can they order as printed?`,answer:f.name,opts:shuffleArr(bad).slice(0,3).map(x=>x.name),vis:null,hint:DIETHINT[code]}));
+if(bad.length>=3) types.push(()=>({prompt:`A guest is <b>${DIETNAME[code].toLowerCase()}</b>. Which of these can they order as printed?`,answer:f.name,opts:shuffleArr(bad).slice(0,3).map(x=>x.name),vis:null,hint:esc(COACH.diet[code]||DIETHINT[code])}));
 });
 q=pick(types)(); q.explain=`${f.name} (${f.price}): ${f.all} · diets: ${(DIET[f.name]||[]).map(t=>DIETNAME[t.replace("*","")]+(t.endsWith("*")?" w/ mod":"")).join(", ")||"none printed"} · mods: ${f.mods}.`;
 } else if(c.kind==="fact"){
 const f=c.f;
 const same=(f.cat==="Allergens & Mods"?ALLERGY_FACTS:FACTS).filter(x=>x.cat===f.cat).map(x=>x.a);
-q={prompt:esc(f.q), answer:f.a, opts:distractors(f.a, same, 3, [...FACTS,...ALLERGY_FACTS].map(x=>x.a)), vis:null, hint:factHint(f)};
+q={prompt:esc(f.q), answer:f.a, opts:distractors(f.a, same, 3, [...FACTS,...ALLERGY_FACTS].map(x=>x.a)), vis:null, hint:COACH.fact[f.q]?esc(COACH.fact[f.q]):factHint(f)};
 q.explain=f.a + (f.x?" — "+f.x:"");
 } else {
-const w=c.w, same=WINES.filter(x=>(x.cat||"Wines BTG")===(w.cat||"Wines BTG")), place=w.region?` · ${esc(w.region)}`:"";
+const w=c.w, same=WINES.filter(x=>(x.cat||"Wines BTG")===(w.cat||"Wines BTG")), K=COACH.wine[w.name]||{}, g=esc(K.g||w.grape),
+kind=w.cat==="Vino de Postre"?"dessert wine":({sparkling:"sparkling wine",rose:"rosé",white:"white",red:"red"})[wineKind(w)]||"wine";
 const types=[
-()=>({prompt:`Which wine tastes like <i>"${esc(w.notes)}"</i>?`,answer:w.name,opts:distractors(w.name,same.map(x=>x.name),3,WINES.map(x=>x.name)),hint:`Grape: ${esc(w.grape)}${place}`}),
-()=>({prompt:`Which wine do you hand a guest who loves <b>${esc(w.like)}</b>?`,answer:w.name,opts:distractors(w.name,same.map(x=>x.name),3,WINES.map(x=>x.name)),hint:`Grape: ${esc(w.grape)}`}),
-()=>({prompt:`Tasting notes for <b>${esc(w.name)}</b>?`,answer:w.notes,opts:distractors(w.notes,same.map(x=>x.notes),3,WINES.map(x=>x.notes)),hint:`Grape: ${esc(w.grape)}. Think of ${esc(w.like)}.`}),
-()=>({prompt:`Glass / bottle price of <b>${esc(w.name)}</b>?`,answer:w.price,opts:distractors(w.price,same.map(x=>x.price),3,WINES.map(x=>x.price)),elim:1,hint:priceHint(w.price,same.map(x=>x.price),w.cat==="Vino de Postre"?"Dessert wines":"Glasses")+" One wrong answer is crossed out."}),
+()=>({prompt:`Which wine tastes like <i>"${esc(w.notes)}"</i>?`,answer:w.name,opts:distractors(w.name,same.map(x=>x.name),3,WINES.map(x=>x.name)),hint:`A ${kind} made from ${g}.`}),
+()=>({prompt:`Which wine do you hand a guest who loves <b>${esc(w.like)}</b>?`,answer:w.name,opts:distractors(w.name,same.map(x=>x.name),3,WINES.map(x=>x.name)),hint:`Look for the ${kind} made from ${g}.`}),
+()=>({prompt:`Tasting notes for <b>${esc(w.name)}</b>?`,answer:w.notes,opts:distractors(w.notes,same.map(x=>x.notes),3,WINES.map(x=>x.notes)),hint:`It's a ${kind} made from ${g}, and it drinks a lot like ${esc(w.like)}.`}),
+()=>({prompt:`Glass / bottle price of <b>${esc(w.name)}</b>?`,answer:w.price,opts:distractors(w.price,same.map(x=>x.price),3,WINES.map(x=>x.price)),elim:1,hint:priceHint(w.price,same.map(x=>x.price),w.cat==="Vino de Postre"?"Dessert wines":"Glasses")+(w.cat==="Vino de Postre"?"":" (Prices read glass / bottle.)")+" One wrong answer is crossed out."}),
 ];
-if(w.region) types.push(()=>({prompt:`Where is <b>${esc(w.name)}</b> from?`,answer:w.region,opts:distractors(w.region,same.map(x=>x.region),3,WINES.map(x=>x.region)),hint:`Grape: ${esc(w.grape)}. Grapes are a good clue to the region.`}));
+if(w.region) types.push(()=>({prompt:`Where is <b>${esc(w.name)}</b> from?`,answer:w.region,opts:distractors(w.region,same.map(x=>x.region),3,WINES.map(x=>x.region)),elim:1,hint:`It's ${g} — grapes are a good clue to the region. One wrong answer is crossed out.`}));
 q=pick(types)(); q.vis=null; q.explain=`${w.name} (${w.price}): ${w.notes} · ${w.grape} · like ${w.like}.`;
 }
 q.choices=shuffleArr([q.answer,...q.opts]); delete q.opts;
 return q; // plain data (no card reference) so it can be saved and re-asked exactly
 }
+// the one line to remember about an item (js/coach.js), shown once a question is answered
+function hookOf(c){ const K=c.kind==="drink"?COACH.drink[c.d.name]:c.kind==="food"?COACH.food[c.fd.name]:c.kind==="wine"?COACH.wine[c.w.name]:null; return K&&K.hook||null; }
 // item name + photo kind for a card (used for photos and the speaker button)
 function itemOf(c){ return c.kind==="drink"?{pk:"d",name:c.d.name}:c.kind==="food"?{pk:"f",name:c.fd.name}:c.kind==="wine"?{pk:null,name:c.w.name}:{pk:null,name:null}; }
 function promptHTML(q,c){
@@ -469,9 +471,11 @@ if(btn&&!ok) btn.classList.add("wrong");
 $("qNoSe").disabled=true; $("qHint").disabled=true;
 if(ok) round.right++; else round.missed.push({k:e.k,q:e.q});
 const {pk,name}=itemOf(currentQ.card);
+const hook=hookOf(currentQ.card);
 let html=ok?`<span class="ok">¡Vale! Correct${hintUsed?" · with a hint":""}.</span>`
-:kind==="nose"?`<span class="soft">No pasa nada — here it is.</span> ${esc(currentQ.explain)}`
-:`<span class="no">Not quite.</span> ${esc(currentQ.explain)}`;
+:kind==="nose"?`<span class="soft">No pasa nada — here it is.</span>`:`<span class="no">Not quite.</span>`;
+if(hook) html+=`<div class="remember"><span class="lbl">Remember it</span>${esc(hook)}</div>`;
+if(!ok) html+=`<div class="${hook?"fbdetail":"fbtext"}">${esc(currentQ.explain)}</div>`;
 const sayb=name?Say.btn(name):""; if(sayb) html+=`<div class="fbx">${sayb}</div>`;
 if(currentQ.vis==="after"&&pk) html+=visual(pk,name,"","","qs");
 $("qFeed").innerHTML=html;

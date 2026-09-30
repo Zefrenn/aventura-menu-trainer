@@ -1,4 +1,6 @@
 // Aventura Menu Trainer — app (v4: brand redesign + swipe deck)
+// theme: recolor the drawings for dark mode, wire the moon/sun button
+inkSVG(ILLUS,FOODILLUS,WGLASS,GICON); AVTheme.bind();
 // photos: fetch the index, then repaint the card on screen (without counting a view)
 loadPhotoIndex().then(()=>{ if(deck.length) render(true); });
 // ---------- unified cards ----------
@@ -88,10 +90,10 @@ function showGate(){
 const known=Object.values(store.profiles).sort((a,b)=>(b.updated||0)-(a.updated||0)).slice(0,8);
 $("gateMsg").textContent=known.length?"Tap your name, or type it below. Use the same name every time so your progress follows you.":"Type your first name and last initial. Use the same name every time so your progress follows you to any phone.";
 $("gateKnown").innerHTML=known.map(p=>`<button data-s="${p.slug}">${esc(p.name)}</button>`).join("");
-[...$("gateKnown").children].forEach(b=>b.onclick=()=>{setProfile(store.profiles[b.dataset.s].name);resetDeck();});
+[...$("gateKnown").children].forEach(b=>b.onclick=()=>{setProfile(store.profiles[b.dataset.s].name);resetDeck();resumeQuiz();});
 $("gateName").value=""; $("gate").classList.remove("hidden"); setTimeout(()=>$("gateName").focus(),50);
 }
-$("gateGo").onclick=()=>{ if(setProfile($("gateName").value)) resetDeck(); else $("gateName").focus(); };
+$("gateGo").onclick=()=>{ if(setProfile($("gateName").value)){ resetDeck(); resumeQuiz(); } else $("gateName").focus(); };
 $("gateName").onkeydown=e=>{ if(e.key==="Enter") $("gateGo").click(); };
 $("whoSwitch").onclick=showGate;
 // ---------- toast ----------
@@ -129,11 +131,11 @@ function closeSheet(){ $("sheet").classList.remove("open"); $("sheet").setAttrib
 $("pickBtn").onclick=openSheet;
 $("sheet").addEventListener("click",e=>{ if(e.target===$("sheet")) closeSheet(); });
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&$("sheet").classList.contains("open")) closeSheet(); });
-function setFilter(v){
-filter=v; const kind=v===null?"Section":DRINKCATS.includes(v)||v==="drinks"?"Drinks":FOODCATS.includes(v)||v==="food"?"Food":["Wines BTG","Vino de Postre","Wine 101","Sherry & Vermouth"].includes(v)?"Wine":v==="Allergens & Mods"?"Food":"Resource guide";
+function labelPicker(){
+const v=filter, kind=v===null?"Section":DRINKCATS.includes(v)||v==="drinks"?"Drinks":FOODCATS.includes(v)||v==="food"?"Food":["Wines BTG","Vino de Postre","Wine 101","Sherry & Vermouth"].includes(v)?"Wine":v==="Allergens & Mods"?"Food":"Resource guide";
 $("pickKind").textContent=kind; $("pickName").textContent=filterLabel();
-resetDeck(); if(!$("quiz").classList.contains("hidden")) startRound();
 }
+function setFilter(v){ filter=v; labelPicker(); resetDeck(); if(!$("quiz").classList.contains("hidden")) startRound(); }
 // ---------- flashcards ----------
 function resetDeck(){ deck=shuffleArr(pool()); idx=0; render(); }
 function achipsHTML(list,major){ return `<div class="achips">${list.map(a=>`<span class="achip${major?" major":""}">${aicon(a)}${esc(a)}</span>`).join("")}</div>`; }
@@ -144,11 +146,11 @@ if(me&&!quiet){ rec(c).seen++; persist(); }
 const F=$("front"), B=$("back");
 if(c.kind==="drink"){
 const d=c.d;
-F.innerHTML=`<div class="inner"><div class="eyebrow cat">${esc(d.cat)}</div><div class="name">${esc(d.name)}</div><div class="price">${esc(d.price)}</div>${visual("d",d.name,ILLUS[d.name],"illus")}<div class="hint">Say the glass, build and garnish out loud — then tap to check.</div></div>`;
+F.innerHTML=`<div class="inner"><div class="eyebrow cat">${esc(d.cat)}</div><div class="name">${esc(d.name)}</div><div class="price">${esc(d.price)}</div>${Say.btn(d.name)}${visual("d",d.name,ILLUS[d.name],"illus")}<div class="hint">Say the glass, build and garnish out loud — then tap to check.</div></div>`;
 const chips=d.colors.length
 ?`<div class="chips">${d.colors.map(cl=>`<span class="chip" style="background:${TAPE[cl]}" aria-hidden="true"></span>`).join("")}<span class="lbl">Batch bottle: ${esc(d.bottle||d.colors.join(" + "))} tape</span></div>`
 :`<div class="chips"><span class="lbl">No batch bottle — built to order</span></div>`;
-B.innerHTML=`<div class="top"><div class="vis">${visual("d",d.name,ILLUS[d.name],"illus","mini")}</div><div><div class="eyebrow">${esc(d.cat)} · ${esc(d.price)}</div><h2 class="dname">${esc(d.name)}</h2></div></div>
+B.innerHTML=`<div class="top"><div class="vis">${visual("d",d.name,ILLUS[d.name],"illus","mini")}</div><div><div class="eyebrow">${esc(d.cat)} · ${esc(d.price)}</div><h2 class="dname">${esc(d.name)}</h2></div>${Say.btn(d.name,true)}</div>
 ${d.flag?`<div class="callout warn"><span class="lbl">Know this</span><p>${esc(d.flag)}</p></div>`:""}
 <div class="spec"><div><span class="lbl">Glass</span>${esc(d.glass)}</div><div><span class="lbl">Garnish</span>${esc(d.garnish)}</div></div>
 <div class="row"><span class="lbl">Build</span><ol class="steps">${d.build.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>${chips}
@@ -160,8 +162,8 @@ const parts=f.all.split("·"), list=parts[0].split(",").map(a=>a.trim()).filter(
 const major=list.filter(a=>MAJOR.test(a)), minor=list.filter(a=>!MAJOR.test(a));
 const tipWarn=f.tip&&/allerg|gluten|fin fish|gelatin|fish|vegetarian|halal|kosher|NOT|not printed|confirm|ask chef/i.test(f.tip);
 const hh=f.hh&&f.cat!=="Happy Hour"?`<span class="hhtag">HH ${esc(f.hh)}</span>`:"";
-F.innerHTML=`<div class="inner"><div class="eyebrow cat">${esc(f.cat)}</div><div class="name${f.name.length>22?" long":""}">${esc(f.name)}</div><div class="price">${esc(f.price)}${hh}</div>${visual("f",f.name,FOODILLUS[f.ill],"fillus")}<div class="hint">Say the drop line, allergens and mods out loud — then tap to check.</div></div>`;
-B.innerHTML=`<div class="top"><div class="vis">${visual("f",f.name,FOODILLUS[f.ill],"fillus","mini")}</div><div><div class="eyebrow">${esc(f.cat)} · ${esc(f.price)}${hh}</div><h2 class="dname">${esc(f.name)}</h2></div></div>
+F.innerHTML=`<div class="inner"><div class="eyebrow cat">${esc(f.cat)}</div><div class="name${f.name.length>22?" long":""}">${esc(f.name)}</div><div class="price">${esc(f.price)}${hh}</div>${Say.btn(f.name)}${visual("f",f.name,FOODILLUS[f.ill],"fillus")}<div class="hint">Say the drop line, allergens and mods out loud — then tap to check.</div></div>`;
+B.innerHTML=`<div class="top"><div class="vis">${visual("f",f.name,FOODILLUS[f.ill],"fillus","mini")}</div><div><div class="eyebrow">${esc(f.cat)} · ${esc(f.price)}${hh}</div><h2 class="dname">${esc(f.name)}</h2></div>${Say.btn(f.name,true)}</div>
 <div class="callout"><span class="lbl">Drop line</span><p class="drop">“${esc(f.drop)}”</p></div>
 ${f.tip?`<div class="callout${tipWarn?" warn":""}"><span class="lbl">${tipWarn?"Know this":"Tip"}</span><p>${esc(f.tip)}</p></div>`:""}
 <div class="row"><span class="lbl">Major allergens</span>${major.length?achipsHTML(major,true):`<div class="also">None of the major allergens</div>`}${minor.length?`<div class="also">Also contains: ${esc(minor.join(", "))}</div>`:""}${parts[1]?`<div class="cc">⚠ ${esc(parts[1].trim())}</div>`:""}</div>
@@ -176,8 +178,8 @@ B.innerHTML=`<div class="eyebrow">${esc(f.cat)}</div><h2 class="dname" style="ma
 <div class="callout"><span class="lbl">Answer</span><p>${esc(f.a)}</p></div>${f.x?`<div class="row"><span class="lbl">More</span>${esc(f.x)}</div>`:""}`;
 } else {
 const w=c.w, k=wineKind(w);
-F.innerHTML=`<div class="inner"><div class="eyebrow cat">${esc(c.cat)}</div><div class="name long">${esc(w.name)}</div><div class="price">${w.region?esc(w.region)+" · ":""}${esc(w.price)}</div><div class="wglass">${WGLASS[k]||""}</div><div class="hint">Grape · place · notes · one story · pairing</div></div>`;
-B.innerHTML=`<div class="top"><div class="vis"><div class="wglass mini">${WGLASS[k]||""}</div></div><div><div class="eyebrow">${esc(c.cat)} · ${esc(w.price)}</div><h2 class="dname">${esc(w.name)}</h2>${w.region?`<div class="sub">${esc(w.region)}</div>`:""}</div></div>
+F.innerHTML=`<div class="inner"><div class="eyebrow cat">${esc(c.cat)}</div><div class="name long">${esc(w.name)}</div><div class="price">${w.region?esc(w.region)+" · ":""}${esc(w.price)}</div>${Say.btn(w.name)}<div class="wglass">${WGLASS[k]||""}</div><div class="hint">Grape · place · notes · one story · pairing</div></div>`;
+B.innerHTML=`<div class="top"><div class="vis"><div class="wglass mini">${WGLASS[k]||""}</div></div><div><div class="eyebrow">${esc(c.cat)} · ${esc(w.price)}</div><h2 class="dname">${esc(w.name)}</h2>${w.region?`<div class="sub">${esc(w.region)}</div>`:""}</div>${Say.btn(w.name,true)}</div>
 <div class="callout"><span class="lbl">Notes</span><p class="drop">${esc(w.notes)}</p></div>
 <div class="spec"><div><span class="lbl">Grape</span>${esc(w.grape)}</div><div><span class="lbl">Similar to</span>${esc(w.like)}</div></div>
 <div class="row"><span class="lbl">Story</span>${esc(w.story)}</div>
@@ -286,114 +288,224 @@ let set=[...new Set(values.filter(v=>v && v!==correct))];
 if(set.length<n) set=[...new Set([...set,...fallback.filter(v=>v && v!==correct)])];
 return shuffleArr(set).slice(0,n);
 }
+// ---- hint helpers: a nudge toward the answer, never the answer itself ----
+const money=p=>/^\d/.test(String(p))?"$"+p:String(p);
+const priceNum=p=>parseFloat(String(p).replace(/^[^0-9.]*/,""));
+function nameShape(n){ const w=String(n).trim().split(/\s+/), art=/^(el|la|los|las|de|del|y)$/i, out=[];
+for(const x of w){ if(art.test(x)&&!out.length){ out.push(x); continue; } out.push(x.charAt(0)+"…"); break; }
+return `starts “${esc(out.join(" "))}” · ${w.length} word${w.length>1?"s":""}`; }
+function trunc(s,n){ s=String(s); return s.length>n?s.slice(0,n).replace(/[,;\s]+[^,;\s]*$/,"")+"…":s; }
+function priceHint(v,list,label){
+const nums=list.map(priceNum).filter(n=>!isNaN(n)).sort((a,b)=>a-b), x=priceNum(v);
+if(nums.length<3||isNaN(x)) return `Think about where it sits on the ${label.toLowerCase()} list.`;
+const lo=nums[Math.floor(nums.length/3)], hi=nums[Math.ceil(2*nums.length/3)-1];
+const pos=x<=lo?"one of the lower-priced ones":x>=hi?"one of the pricier ones":"right in the middle";
+return `${esc(label)} run ${money(nums[0])}–${money(nums[nums.length-1])}. This one is ${pos}.`; }
+function glassUse(g){ const k=GLASS.find(x=>String(g).toLowerCase().startsWith(x[0].toLowerCase())); return k?k[1]:null; }
+const HIDES=[[/gluten|wheat/,"bread and baguette, flour, breading and fried batter, fideos, shoyu"],[/dairy|milk/,"cheese, butter, cream and milk"],[/egg/,"aioli and mayo, tortilla, custards and batters"],[/shellfish|crustacean/,"gambas, prawns and shellfish stock"],[/mollusk/,"pulpo, squid, clams and mussels"],[/fish/,"anchovies (including anchovy aioli), tuna, sardines, bacalao"],[/nut/,"almonds, marcona, pistachio"],[/soy/,"shoyu and soy sauce"],[/sesame/,"sesame seeds and tahini"],[/pork/,"jamón, chorizo, pork belly and pork gelatin"],[/mustard|dijon/,"dijon and vinaigrettes"]];
+const DIETHINT={V:"Vegetarian means no meat or fish. Watch for anchovy, jamón and gelatin.",VG:"Vegan means no meat, fish, dairy, egg or honey. Aioli and cheese are the usual traps.",GF:"Gluten-free as printed means no bread, flour, breading, fideos or shoyu.",DF:"Dairy-free means no cheese, butter, cream or milk."};
+function shapeHint(ans){ const w=String(ans).trim().split(/\s+/);
+return w.length>4?`It begins “${esc(w.slice(0,2).join(" "))} …”`:`The answer is ${w.length} word${w.length>1?"s":""} and starts with “${esc(String(ans).trim().charAt(0).toUpperCase())}”.`; }
+function factHint(f){
+if(f.x){ const x=f.x.toLowerCase(), words=(f.a.toLowerCase().match(/[a-záéíóúñü']{5,}/g)||[]);
+if(!x.includes(f.a.toLowerCase())&&!words.some(w=>x.includes(w))) return esc(f.x)+".";
+}
+return shapeHint(f.a);
+}
+// q.vis: "id" photo is the question · "illus" drawing is the question · "q" photo shown with the question
+//        "after" photo shown once answered (it would give the answer away, e.g. glass or garnish)
 function makeQuestion(c){
 let q;
-const _c=c;
 if(c.kind==="drink"){
-const d=c.d, all=DRINKS;
+const d=c.d, all=DRINKS, use=glassUse(d.glass);
 const types=[
-()=>({prompt:`What glass does <b>${esc(d.name)}</b> go in?`,answer:d.glass,opts:distractors(d.glass,all.map(x=>x.glass))}),
-()=>({prompt:`Which drink is this?<br><i>"${esc(d.menu)}"</i>`,answer:d.name,opts:distractors(d.name,all.map(x=>x.name))}),
+()=>({prompt:`What glass does <b>${esc(d.name)}</b> go in?`,answer:d.glass,opts:distractors(d.glass,all.map(x=>x.glass)),vis:"after",
+hint:use?`The right glass is the one the bar uses for <i>${esc(use.toLowerCase())}</i>.`:`Think about how it's served: up, on ice, or long.`}),
+()=>({prompt:`Which drink is this?<br><i>"${esc(d.menu)}"</i>`,answer:d.name,opts:distractors(d.name,all.map(x=>x.name)),vis:"q",
+hint:`${esc(d.cat)} · ${esc(d.price)} · ${nameShape(d.name)}`}),
 ];
 if(d.cat!=="Sangria"){
-types.push(()=>({prompt:`What's the garnish on <b>${esc(d.name)}</b>?`,answer:d.garnish,opts:distractors(d.garnish,all.map(x=>x.garnish).filter(g=>!/confirm/i.test(g)))}));
-types.push(()=>({prompt:`What's the build for <b>${esc(d.name)}</b>?`,answer:d.build.join(" · "),opts:distractors(d.build.join(" · "),all.filter(x=>x.cat!=="Sangria").map(x=>x.build.join(" · ")))}));
+types.push(()=>({prompt:`What's the garnish on <b>${esc(d.name)}</b>?`,answer:d.garnish,opts:distractors(d.garnish,all.map(x=>x.garnish).filter(g=>!/confirm/i.test(g))),vis:"after",
+hint:`Garnishes usually echo what's in the glass: <i>${esc(d.menu)}</i>.`}));
+types.push(()=>{ const ans=d.build.join(" · "), opts=distractors(ans,all.filter(x=>x.cat!=="Sangria").map(x=>x.build.join(" · ")));
+const step=d.build.find(s=>!opts.some(o=>o.includes(s)))||d.build[0];
+return {prompt:`What's the build for <b>${esc(d.name)}</b>?`,answer:ans,opts,vis:"q",hint:`One of the steps is <b>${esc(step)}</b>.`}; });
 }
-if(d.colors.length) types.push(()=>({prompt:`Batch bottle color for <b>${esc(d.name)}</b>?`,answer:d.colors.join(" + "),opts:distractors(d.colors.join(" + "),all.filter(x=>x.colors.length).map(x=>x.colors.join(" + ")))}));
-if(photoOf("d",d.name)){ const pq=()=>({prompt:`Which drink is this?${visual("d",d.name,"","","q")}`,answer:d.name,opts:distractors(d.name,all.filter(x=>x.glass.split(" ")[0]===d.glass.split(" ")[0]).map(x=>x.name),3,all.map(x=>x.name))}); types.push(pq,pq); }
-else if(ILLUS[d.name]) types.push(()=>({prompt:`Which drink is served like this?<div class="qillus">${ILLUS[d.name]}</div>`,answer:d.name,opts:distractors(d.name,all.map(x=>x.name))}));
+if(d.colors.length) types.push(()=>({prompt:`Batch bottle color for <b>${esc(d.name)}</b>?`,answer:d.colors.join(" + "),opts:distractors(d.colors.join(" + "),all.filter(x=>x.colors.length).map(x=>x.colors.join(" + "))),vis:"q",elim:1,
+hint:`${d.colors.length===1?"A single tape color":"Two tape colors"}. One wrong answer is crossed out.`}));
+if(photoOf("d",d.name)){ const pq=()=>({prompt:`Which drink is this?`,answer:d.name,opts:distractors(d.name,all.filter(x=>x.glass.split(" ")[0]===d.glass.split(" ")[0]).map(x=>x.name),3,all.map(x=>x.name)),vis:"id",
+hint:`${esc(d.cat)} · <i>${esc(d.menu)}</i>`}); types.push(pq,pq); }
+else if(ILLUS[d.name]) types.push(()=>({prompt:`Which drink is served like this?`,answer:d.name,opts:distractors(d.name,all.map(x=>x.name)),vis:"illus",
+hint:`${esc(d.cat)} · ${nameShape(d.name)}`}));
 q=pick(types)(); q.explain=`${d.name}: ${d.glass} · ${d.build.join(" · ")} · garnish ${d.garnish}.`;
 } else if(c.kind==="food"){
-const f=c.fd, all=FOOD;
+const f=c.fd, all=FOOD, major=f.all.split("·")[0].split(",").map(a=>a.trim()).filter(a=>MAJOR.test(a));
 const types=[
-()=>({prompt:`Which dish is this?<br><i>“${esc(f.drop)}”</i>`,answer:f.name,opts:distractors(f.name,all.map(x=>x.name))}),
-()=>({prompt:`Allergens in <b>${esc(f.name)}</b>?`,answer:f.all,opts:distractors(f.all,all.map(x=>x.all))}),
-()=>({prompt:`Dinner-menu price of <b>${esc(f.name)}</b>?`,answer:f.price,opts:distractors(f.price,all.filter(x=>x.cat===f.cat).map(x=>x.price),3,all.map(x=>x.price))}),
+()=>({prompt:`Which dish is this?<br><i>“${esc(f.drop)}”</i>`,answer:f.name,opts:distractors(f.name,all.map(x=>x.name)),vis:"q",
+hint:`${esc(f.cat)} · ${esc(money(f.price))} · ${nameShape(f.name)}`}),
+()=>({prompt:`Allergens in <b>${esc(f.name)}</b>?`,answer:f.all,opts:distractors(f.all,all.map(x=>x.all)),vis:"q",
+hint:`Work from the ingredients: <i>${esc(trunc(f.ing,150))}</i>`}),
+()=>({prompt:`Dinner-menu price of <b>${esc(f.name)}</b>?`,answer:f.price,opts:distractors(f.price,all.filter(x=>x.cat===f.cat).map(x=>x.price),3,all.map(x=>x.price)),vis:"q",elim:1,
+hint:priceHint(f.price,all.filter(x=>x.cat===f.cat).map(x=>x.price),f.cat)+" One wrong answer is crossed out."}),
 ];
-if(photoOf("f",f.name)){ const pq=()=>({prompt:`Which dish is this?${visual("f",f.name,"","","q")}`,answer:f.name,opts:distractors(f.name,all.filter(x=>x.cat===f.cat).map(x=>x.name),3,all.map(x=>x.name))}); types.push(pq,pq); }
-else types.push(()=>({prompt:`Which dish is served like this?<div class="qillus"><div class="fillus">${FOODILLUS[f.ill]}</div></div>`,answer:f.name,opts:distractors(f.name,all.filter(x=>x.ill===f.ill).map(x=>x.name),3,all.map(x=>x.name))}));
-if(f.mods!=="None") types.push(()=>({prompt:`Approved mods for <b>${esc(f.name)}</b>?`,answer:f.mods,opts:distractors(f.mods,all.filter(x=>x.mods!=="None").map(x=>x.mods))}));
-if(!/^None/.test(f.ut)) types.push(()=>({prompt:`What drops with <b>${esc(f.name)}</b>?`,answer:f.ut,opts:distractors(f.ut,all.map(x=>x.ut))}));
-if(f.pair) types.push(()=>({prompt:`Printed dessert-wine pairing for <b>${esc(f.name)}</b>?`,answer:f.pair,opts:distractors(f.pair,all.filter(x=>x.pair).map(x=>x.pair))}));
+if(photoOf("f",f.name)){ const pq=()=>({prompt:`Which dish is this?`,answer:f.name,opts:distractors(f.name,all.filter(x=>x.cat===f.cat).map(x=>x.name),3,all.map(x=>x.name)),vis:"id",
+hint:`${esc(f.cat)} · ${nameShape(f.name)}`}); types.push(pq,pq); }
+else types.push(()=>({prompt:`Which dish is served like this?`,answer:f.name,opts:distractors(f.name,all.filter(x=>x.ill===f.ill).map(x=>x.name),3,all.map(x=>x.name)),vis:"illus",
+hint:`${esc(f.cat)} · ${esc(money(f.price))} · ${nameShape(f.name)}`}));
+if(f.mods!=="None") types.push(()=>({prompt:`Approved mods for <b>${esc(f.name)}</b>?`,answer:f.mods,opts:distractors(f.mods,all.filter(x=>x.mods!=="None").map(x=>x.mods)),vis:"q",
+hint:major.length?`A mod usually takes out an allergen. This dish has: ${esc(major.join(", "))}.`:`Think about what a guest would most often ask to leave off.`}));
+if(!/^None/.test(f.ut)) types.push(()=>({prompt:`What drops with <b>${esc(f.name)}</b>?`,answer:f.ut,opts:distractors(f.ut,all.map(x=>x.ut)),vis:"q",
+hint:`Picture how it's eaten: <i>“${esc(f.drop)}”</i>`}));
+if(f.pair) types.push(()=>({prompt:`Printed dessert-wine pairing for <b>${esc(f.name)}</b>?`,answer:f.pair,opts:distractors(f.pair,all.filter(x=>x.pair).map(x=>x.pair)),vis:"q",
+hint:`Match the sweetness and weight of the dessert: <i>“${esc(f.drop)}”</i>`}));
 // scenario: guest allergy — which dish is SAFE
-const words=f.all.split("·")[0].split(",").map(a=>a.trim()).filter(a=>MAJOR.test(a));
-if(words.length){
-const w=pick(words); const key=w.replace(/\s*\(.*\)/,"").toLowerCase();
+if(major.length){
+const w=pick(major); const key=w.replace(/\s*\(.*\)/,"").toLowerCase();
 const safe=all.filter(x=>!x.all.toLowerCase().includes(key.split(" ")[0]));
 const unsafe=all.filter(x=>x!==f && x.all.toLowerCase().includes(key.split(" ")[0]));
-if(safe.length&&unsafe.length>=2) types.push(()=>{const ans=pick(safe).name;return {prompt:`A guest has a <b>${esc(key)}</b> allergy. Which of these can they order?`,answer:ans,opts:distractors(ans,[f.name,...shuffleArr(unsafe).slice(0,2).map(x=>x.name)])};});
+const hides=(HIDES.find(h=>h[0].test(key))||[0,null])[1];
+if(safe.length&&unsafe.length>=2) types.push(()=>{const ans=pick(safe).name;return {prompt:`A guest has a <b>${esc(key)}</b> allergy. Which of these can they order?`,answer:ans,opts:distractors(ans,[f.name,...shuffleArr(unsafe).slice(0,2).map(x=>x.name)]),vis:null,
+hint:hides?`${esc(key.charAt(0).toUpperCase()+key.slice(1))} usually hides in ${esc(hides)}. Three of these have it.`:`Three of these contain ${esc(key)}. Think through each dish's ingredients.`};});
 }
 // scenario: dietary restriction — which dish is safe as printed
 ["V","VG","GF","DF"].forEach(code=>{
 const has=x=>(DIET[x.name]||[]).includes(code);
 if(!has(f)) return;
 const bad=all.filter(x=>!(DIET[x.name]||[]).some(t=>t.replace("*","")===code));
-if(bad.length>=3) types.push(()=>({prompt:`A guest is <b>${DIETNAME[code].toLowerCase()}</b>. Which of these can they order as printed?`,answer:f.name,opts:shuffleArr(bad).slice(0,3).map(x=>x.name)}));
+if(bad.length>=3) types.push(()=>({prompt:`A guest is <b>${DIETNAME[code].toLowerCase()}</b>. Which of these can they order as printed?`,answer:f.name,opts:shuffleArr(bad).slice(0,3).map(x=>x.name),vis:null,hint:DIETHINT[code]}));
 });
 q=pick(types)(); q.explain=`${f.name} (${f.price}): ${f.all} · diets: ${(DIET[f.name]||[]).map(t=>DIETNAME[t.replace("*","")]+(t.endsWith("*")?" w/ mod":"")).join(", ")||"none printed"} · mods: ${f.mods}.`;
 } else if(c.kind==="fact"){
 const f=c.f;
 const same=(f.cat==="Allergens & Mods"?ALLERGY_FACTS:FACTS).filter(x=>x.cat===f.cat).map(x=>x.a);
-q={prompt:esc(f.q), answer:f.a, opts:distractors(f.a, same, 3, [...FACTS,...ALLERGY_FACTS].map(x=>x.a))};
+q={prompt:esc(f.q), answer:f.a, opts:distractors(f.a, same, 3, [...FACTS,...ALLERGY_FACTS].map(x=>x.a)), vis:null, hint:factHint(f)};
 q.explain=f.a + (f.x?" — "+f.x:"");
 } else {
-const w=c.w, same=WINES.filter(x=>(x.cat||"Wines BTG")===(w.cat||"Wines BTG"));
+const w=c.w, same=WINES.filter(x=>(x.cat||"Wines BTG")===(w.cat||"Wines BTG")), place=w.region?` · ${esc(w.region)}`:"";
 const types=[
-()=>({prompt:`Which wine tastes like <i>"${esc(w.notes)}"</i>?`,answer:w.name,opts:distractors(w.name,same.map(x=>x.name),3,WINES.map(x=>x.name))}),
-()=>({prompt:`Which wine do you hand a guest who loves <b>${esc(w.like)}</b>?`,answer:w.name,opts:distractors(w.name,same.map(x=>x.name),3,WINES.map(x=>x.name))}),
-()=>({prompt:`Tasting notes for <b>${esc(w.name)}</b>?`,answer:w.notes,opts:distractors(w.notes,same.map(x=>x.notes),3,WINES.map(x=>x.notes))}),
-()=>({prompt:`Glass / bottle price of <b>${esc(w.name)}</b>?`,answer:w.price,opts:distractors(w.price,same.map(x=>x.price),3,WINES.map(x=>x.price))}),
+()=>({prompt:`Which wine tastes like <i>"${esc(w.notes)}"</i>?`,answer:w.name,opts:distractors(w.name,same.map(x=>x.name),3,WINES.map(x=>x.name)),hint:`Grape: ${esc(w.grape)}${place}`}),
+()=>({prompt:`Which wine do you hand a guest who loves <b>${esc(w.like)}</b>?`,answer:w.name,opts:distractors(w.name,same.map(x=>x.name),3,WINES.map(x=>x.name)),hint:`Grape: ${esc(w.grape)}`}),
+()=>({prompt:`Tasting notes for <b>${esc(w.name)}</b>?`,answer:w.notes,opts:distractors(w.notes,same.map(x=>x.notes),3,WINES.map(x=>x.notes)),hint:`Grape: ${esc(w.grape)}. Think of ${esc(w.like)}.`}),
+()=>({prompt:`Glass / bottle price of <b>${esc(w.name)}</b>?`,answer:w.price,opts:distractors(w.price,same.map(x=>x.price),3,WINES.map(x=>x.price)),elim:1,hint:priceHint(w.price,same.map(x=>x.price),w.cat==="Vino de Postre"?"Dessert wines":"Glasses")+" One wrong answer is crossed out."}),
 ];
-if(w.region) types.push(()=>({prompt:`Where is <b>${esc(w.name)}</b> from?`,answer:w.region,opts:distractors(w.region,same.map(x=>x.region),3,WINES.map(x=>x.region))}));
-q=pick(types)(); q.explain=`${w.name} (${w.price}): ${w.notes} · ${w.grape} · like ${w.like}.`;
+if(w.region) types.push(()=>({prompt:`Where is <b>${esc(w.name)}</b> from?`,answer:w.region,opts:distractors(w.region,same.map(x=>x.region),3,WINES.map(x=>x.region)),hint:`Grape: ${esc(w.grape)}. Grapes are a good clue to the region.`}));
+q=pick(types)(); q.vis=null; q.explain=`${w.name} (${w.price}): ${w.notes} · ${w.grape} · like ${w.like}.`;
 }
-q.choices=shuffleArr([q.answer,...q.opts]); q.card=_c;
-return q;
+q.choices=shuffleArr([q.answer,...q.opts]); delete q.opts;
+return q; // plain data (no card reference) so it can be saved and re-asked exactly
+}
+// item name + photo kind for a card (used for photos and the speaker button)
+function itemOf(c){ return c.kind==="drink"?{pk:"d",name:c.d.name}:c.kind==="food"?{pk:"f",name:c.fd.name}:c.kind==="wine"?{pk:null,name:c.w.name}:{pk:null,name:null}; }
+function promptHTML(q,c){
+const {pk,name}=itemOf(c);
+const drawing=()=>c.kind==="drink"?`<div class="qillus">${ILLUS[name]||""}</div>`:c.kind==="food"?`<div class="qillus"><div class="fillus">${FOODILLUS[c.fd.ill]||""}</div></div>`:"";
+if(q.vis==="id") return q.prompt+(visual(pk,name,"","","q")||drawing());
+if(q.vis==="illus") return q.prompt+drawing();
+if(q.vis==="q"&&pk) return visual(pk,name,"","","qs")+q.prompt;
+return q.prompt;
 }
 // ---- rounds: one question per card, no repeats until the round is done ----
+// queue entries are {k: card key, q: the exact question once asked}. Missed/skipped keep the exact
+// question, so "Retry" re-asks what you missed (not a new random question about the same item).
+// The round is saved per trainee, so a reload or a phone killing the tab doesn't lose it.
 const ROUND_MAX=30;
-let round={queue:[],i:0,right:0,missed:[],cycle:new Set(),label:""};
-function startRound(cards){
-const p=pool(); const key=filterLabel();
+const CARDBYKEY=new Map(CARDS.map(c=>[cardKey(c),c]));
+let round={queue:[],i:0,right:0,answered:0,missed:[],skipped:[],cycle:new Set(),label:"",retry:false,done:false}, hintUsed=false;
+const RKEY=()=>me?"av_round_"+me.slug:null;
+function saveRound(){ const k=RKEY(); if(!k) return;
+try{ localStorage.setItem(k,JSON.stringify({v:1,filter,label:round.label,queue:round.queue,i:round.i,right:round.right,answered:round.answered,missed:round.missed,skipped:round.skipped,retry:round.retry,done:round.done,cur:answered?"answered":"open",at:Date.now()})); }catch(e){} }
+function restoreRound(){
+const k=RKEY(); if(!k) return false; let o=null;
+try{ o=JSON.parse(localStorage.getItem(k)||"null"); }catch(e){}
+if(!o||o.v!==1||!Array.isArray(o.queue)||Date.now()-(o.at||0)>7*864e5) return false;
+const ok=e=>e&&CARDBYKEY.has(e.k);
+const queue=o.queue.filter(ok); if(!queue.length) return false;
+filter=o.filter===undefined?null:o.filter; labelPicker(); deck=shuffleArr(pool()); idx=0; render();
+Object.assign(round,{queue,i:Math.min(o.i||0,queue.length-1),right:o.right||0,answered:o.answered||0,missed:(o.missed||[]).filter(ok),skipped:(o.skipped||[]).filter(ok),retry:!!o.retry,done:!!o.done,label:filterLabel()});
+if(round.done) finishRound();
+else if(o.cur==="answered"){ if(round.i>=round.queue.length-1) finishRound(); else { round.i++; showPlay(); showQuestion(); } }
+else { showPlay(); showQuestion(); }
+return true;
+}
+function showPlay(){ $("qDone").classList.add("hidden"); $("qNavDone").classList.add("hidden"); $("qBox").classList.remove("hidden"); $("qNavPlay").classList.remove("hidden"); }
+function startRound(entries){
+const p=pool(), key=filterLabel();
 if(round.label!==key){ round.cycle=new Set(); round.label=key; }
-let src=cards||p.filter(c=>!round.cycle.has(cardKey(c)));
-if(!cards&&src.length<Math.min(ROUND_MAX,p.length)){ round.cycle=new Set(); src=p.slice(); } // cycle exhausted -> start over
-round.queue=shuffleArr(src.slice()).slice(0,ROUND_MAX); round.i=0; round.right=0; round.missed=[];
-round.queue.forEach(c=>round.cycle.add(cardKey(c)));
-$("qDone").classList.add("hidden"); $("qNavDone").classList.add("hidden"); $("qBox").classList.remove("hidden"); $("qNavPlay").classList.remove("hidden");
-showQuestion();
+let queue;
+if(entries){ queue=shuffleArr(entries.filter(e=>CARDBYKEY.has(e.k)).map(e=>({k:e.k,q:e.q?JSON.parse(JSON.stringify(e.q)):null}))); }
+else {
+let src=p.filter(c=>!round.cycle.has(cardKey(c)));
+if(src.length<Math.min(ROUND_MAX,p.length)){ round.cycle=new Set(); src=p.slice(); } // cycle exhausted -> start over
+queue=shuffleArr(src.slice()).slice(0,ROUND_MAX).map(c=>({k:cardKey(c),q:null}));
+queue.forEach(e=>round.cycle.add(e.k));
+}
+Object.assign(round,{queue,i:0,right:0,answered:0,missed:[],skipped:[],retry:!!entries,done:false});
+if(!queue.length){ finishRound(); return; }
+showPlay(); showQuestion();
 }
 const KEYS=["A","B","C","D","E","F"];
 function showQuestion(){
-const c=round.queue[round.i]; currentQ=makeQuestion(c); answered=false;
-$("qCat").textContent=filterLabel(); $("qPos").textContent=`Question ${round.i+1} of ${round.queue.length}`;
+const e=round.queue[round.i], c=CARDBYKEY.get(e.k);
+if(!e.q) e.q=makeQuestion(c); else e.q.choices=shuffleArr(e.q.choices.slice());
+currentQ={...e.q,card:c}; answered=false; hintUsed=false;
+$("qCat").textContent=filterLabel()+(round.retry?" · retry":""); $("qPos").textContent=`Question ${round.i+1} of ${round.queue.length}`;
 $("qBar").style.width=(100*round.i/round.queue.length)+"%";
-$("qPrompt").innerHTML=currentQ.prompt; $("qFeed").innerHTML=""; $("qOpts").innerHTML="";
-currentQ.choices.forEach((ch,i)=>{ const b=document.createElement("button"); b.textContent=ch; b.dataset.v=ch; b.dataset.k=KEYS[i]; b.onclick=()=>answer(b,ch); $("qOpts").appendChild(b); });
-$("qNext").textContent = round.i===round.queue.length-1 ? "Finish round" : "Next question";
-$("qScore").textContent=`This round: ${round.right} / ${round.i}` + (me&&me.quiz.total?` · all-time ${Math.round(100*me.quiz.right/me.quiz.total)}%`:"");
+$("qPrompt").innerHTML=promptHTML(currentQ,c); $("qFeed").innerHTML=""; $("qOpts").innerHTML="";
+currentQ.choices.forEach((ch,i)=>{ const b=document.createElement("button"); b.textContent=ch; b.dataset.v=ch; b.dataset.k=KEYS[i]; b.onclick=()=>reveal(ch===currentQ.answer?"right":"wrong",b); $("qOpts").appendChild(b); });
+$("qHint").hidden=!currentQ.hint; $("qHint").disabled=false; $("qHintBox").hidden=true; $("qHintBox").innerHTML="";
+$("qNoSe").disabled=false;
+navLabel(); scoreLine(); saveRound();
 }
-function answer(btn,choice){
-if(answered)return; answered=true;
-const ok=choice===currentQ.answer;
-[...$("qOpts").children].forEach(b=>b.disabled=true);
-if(ok){round.right++;btn.classList.add("correct");$("qFeed").innerHTML=`<span class="ok">¡Vale! Correct.</span>`;}
-else{btn.classList.add("wrong"); round.missed.push(currentQ.card);
-[...$("qOpts").children].forEach(b=>{if(b.dataset.v===currentQ.answer)b.classList.add("correct");});
-$("qFeed").innerHTML=`<span class="no">Not quite.</span> ${esc(currentQ.explain)}`;}
+function navLabel(){ const last=round.i>=round.queue.length-1;
+$("qNext").classList.toggle("gold",answered);
+$("qNext").textContent=answered?(last?"Finish round":"Next question"):(last?"Skip · finish":"Skip ›"); }
+function scoreLine(){ $("qScore").textContent=`This round: ${round.right} / ${round.answered}`+(round.skipped.length?` · ${round.skipped.length} skipped`:"")+(me&&me.quiz.total?` · all-time ${Math.round(100*me.quiz.right/me.quiz.total)}%`:""); }
+// kind: "right" · "wrong" · "nose" (No sé — counts as a miss, shows the answer kindly)
+function reveal(kind,btn){
+if(answered) return; answered=true; round.answered++;
+const ok=kind==="right", e=round.queue[round.i];
+[...$("qOpts").children].forEach(b=>{ b.disabled=true; if(b.dataset.v===currentQ.answer) b.classList.add("correct"); });
+if(btn&&!ok) btn.classList.add("wrong");
+$("qNoSe").disabled=true; $("qHint").disabled=true;
+if(ok) round.right++; else round.missed.push({k:e.k,q:e.q});
+const {pk,name}=itemOf(currentQ.card);
+let html=ok?`<span class="ok">¡Vale! Correct${hintUsed?" · with a hint":""}.</span>`
+:kind==="nose"?`<span class="soft">No pasa nada — here it is.</span> ${esc(currentQ.explain)}`
+:`<span class="no">Not quite.</span> ${esc(currentQ.explain)}`;
+const sayb=name?Say.btn(name):""; if(sayb) html+=`<div class="fbx">${sayb}</div>`;
+if(currentQ.vis==="after"&&pk) html+=visual(pk,name,"","","qs");
+$("qFeed").innerHTML=html;
 if(me){ const r=rec(currentQ.card); if(ok){r.right++;} else {r.wrong++; r.rate=null;} me.quiz={right:(me.quiz.right||0)+(ok?1:0),total:(me.quiz.total||0)+1}; score={right:me.quiz.right,total:me.quiz.total}; persist(); }
-$("qScore").textContent=`This round: ${round.right} / ${round.i+1}`;
+navLabel(); scoreLine(); saveRound();
 }
+function advance(){ if(round.i>=round.queue.length-1) finishRound(); else { round.i++; showQuestion(); } }
+function skipQuestion(){ if(answered) return; const e=round.queue[round.i]; round.skipped.push({k:e.k,q:e.q}); toast("Skipped · it'll be in your retry"); advance(); }
+$("qHint").onclick=()=>{
+if(answered||!currentQ||!currentQ.hint) return; hintUsed=true;
+$("qHintBox").innerHTML=`<span class="lbl">Pista · hint</span>${currentQ.hint}`; $("qHintBox").hidden=false; $("qHint").disabled=true;
+if(currentQ.elim){ const wrong=[...$("qOpts").children].filter(b=>b.dataset.v!==currentQ.answer);
+shuffleArr(wrong).slice(0,currentQ.elim).forEach(b=>{ b.classList.add("elim"); b.disabled=true; b.setAttribute("aria-label",b.textContent+" (ruled out)"); }); }
+};
+$("qNoSe").onclick=()=>reveal("nose",null);
 function finishRound(){
+round.done=true;
 $("qBox").classList.add("hidden"); $("qNavPlay").classList.add("hidden"); $("qDone").classList.remove("hidden"); $("qNavDone").classList.remove("hidden");
-const n=round.queue.length, pct=Math.round(100*round.right/n);
-$("qFinal").textContent=pct+"%"; $("qFinalSub").textContent=`${round.right} of ${n} correct · ${filterLabel()}` + (pct===100?" · perfect round!":"");
-$("qMissed").innerHTML=round.missed.length?`<div class="eyebrow" style="margin-bottom:4px">Missed</div>`+round.missed.map(c=>`<div class="weak"><span>${esc(cardTitle(c))}</span><span>${c.kind==="drink"?"drink":c.kind==="food"?"food":c.kind==="wine"?"wine":"guide"}</span></div>`).join(""):`<div class="subl" style="margin-top:8px">Nothing missed. Flip to a harder section.</div>`;
-$("qRetry").disabled=!round.missed.length; $("qRetry").style.opacity=round.missed.length?1:.4;
+const a=round.answered, pct=a?Math.round(100*round.right/a):0, sk=round.skipped.length;
+$("qFinal").textContent=a?pct+"%":"—";
+$("qFinalSub").textContent=(a?`${round.right} of ${a} correct`:"No questions answered")+(sk?` · ${sk} skipped`:"")+` · ${filterLabel()}`+(round.retry?" · retry round":"")+(a&&pct===100&&!sk?" · perfect round!":"");
+const tag=c=>c.kind==="drink"?"drink":c.kind==="food"?"food":c.kind==="wine"?"wine":"guide";
+const row=(e,lbl)=>{ const c=CARDBYKEY.get(e.k); return c?`<div class="weak"><span>${esc(cardTitle(c))}</span><span>${lbl||tag(c)}</span></div>`:""; };
+$("qMissed").innerHTML=(round.missed.length?`<div class="eyebrow" style="margin-bottom:4px">Missed</div>`+round.missed.map(e=>row(e)).join(""):"")
++(sk?`<div class="eyebrow" style="margin:12px 0 4px">Skipped</div>`+round.skipped.map(e=>row(e,"skipped")).join(""):"")
++(!round.missed.length&&!sk?`<div class="subl" style="margin-top:8px">Nothing missed. Flip to a harder section.</div>`:"");
+const redo=round.missed.length+sk;
+$("qRetry").disabled=!redo; $("qRetry").style.opacity=redo?1:.4;
+$("qRetry").textContent=redo?`Retry ${round.missed.length&&sk?"missed & skipped":sk?"skipped":"missed"} (${redo})`:"Retry missed";
+$("qBar").style.width="100%"; scoreLine(); saveRound();
 }
-$("qNext").onclick=()=>{ if(!answered){ $("qFeed").innerHTML=`<span class="no">Choose an answer to continue.</span>`; return; } if(round.i>=round.queue.length-1) finishRound(); else { round.i++; showQuestion(); } };
+$("qNext").onclick=()=>{ if(!answered) skipQuestion(); else advance(); };
 $("qRestart").onclick=()=>startRound();
-$("qRetry").onclick=()=>{ if(round.missed.length) startRound(round.missed.slice()); };
+$("qRetry").onclick=()=>{ const redo=[...round.missed,...round.skipped]; if(redo.length) startRound(redo); };
 $("qNew").onclick=()=>startRound();
 // ---------- key (quick reference) ----------
 const GLASS=[["Coupe","Most up crafted cocktails"],["Nick & Nora","Spirit-forward cocktails"],["Rocks","On the rocks / king cube"],["Collins","Still Sant Aniol, beer, cider, highballs & long cocktails"],["Goblet","Gin tonics & sangria BTG"],["Tulip","NA beers & tulip NA builds"],["Neat glass","Shots"],["Wine (bar)","Sparkling Sant Aniol & spritz"],["Flute","Sparkling wine BTG & bottle"],["White wine glass","Sangria pitcher service"],["AP glass","All BTG still wine"]];
@@ -455,5 +567,6 @@ $("mQuiz").onclick=()=>{setMode("Quiz"); if(!round.queue.length||round.label!==f
 $("mKey").onclick=()=>setMode("Key");
 $("mProg").onclick=()=>setMode("Prog");
 if(store.last&&store.profiles[store.last]) setProfile(store.profiles[store.last].name); else showGate();
-setFilter(null); startRound();
+function resumeQuiz(){ if(!restoreRound()) startRound(); }
+filter=null; labelPicker(); resetDeck(); resumeQuiz();
 if(coachSeen<3){ $("coach").hidden=false; setTimeout(()=>$("coach").hidden=true,3000); }

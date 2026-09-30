@@ -2,7 +2,12 @@
 const $=id=>document.getElementById(id);
 const SUBS=["Drinks","Food","Allergens & Mods","Wines by the glass","Resource guide"];
 const SUBSHORT={"Drinks":"Drinks","Food":"Food","Allergens & Mods":"Allergens","Wines by the glass":"Wines","Resource guide":"Guide"};
-const C={brick:"#C88F79",gold:"#E3B7A5",olive:"#7C8A7E",rose:"#D19E8C",line:"#E6E3E1",ink:"#55565A",mute:"#8A8B8F"};
+// chart colors follow the theme; grid / label colors flip for dark mode
+const C_LIGHT={brick:"#C88F79",gold:"#E3B7A5",olive:"#7C8A7E",rose:"#D19E8C",line:"#E6E3E1",ink:"#55565A",mute:"#8A8B8F",grid:"#EFECEA"};
+const C_DARK={brick:"#D59C86",gold:"#E3B7A5",olive:"#93A596",rose:"#DDAA98",line:"#4A4B51",ink:"#E7E4E1",mute:"#9A9BA0",grid:"#3A3B40"};
+let C=AVTheme.isDark()?C_DARK:C_LIGHT;
+inkSVG(ILLUS,FOODILLUS); AVTheme.bind();
+AVTheme.onChange(t=>{ C=t==="dark"?C_DARK:C_LIGHT; if(rows.length&&!$("board").classList.contains("hidden")) render(); });
 const ICON={
   chev:'<path d="M6 9l6 6 6-6"/>', sortNone:'<path d="M8 4v16M8 20l-3-3M8 20l3-3M16 20V4M16 4l-3 3M16 4l3 3"/>', sortAsc:'<path d="M12 19V5M5 12l7-7 7 7"/>', sortDesc:'<path d="M12 5v14M5 12l7 7 7-7"/>',
   camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>', check:'<path d="M20 6L9 17l-5-5"/>',
@@ -40,7 +45,7 @@ function visibleRows(){
 }
 function mkChart(id,cfg){ if(typeof Chart==="undefined") return; if(charts[id]) charts[id].destroy(); charts[id]=new Chart($(id),cfg); }
 const baseOpts=(fmt)=>({responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.x??c.parsed.y)}}},
-  scales:{x:{grid:{display:false},ticks:{color:C.mute,font:{family:"Josefin Sans"}}},y:{grid:{color:"#EFECEA"},ticks:{color:C.mute,font:{family:"Josefin Sans"}}}}});
+  scales:{x:{grid:{display:false},ticks:{color:C.mute,font:{family:"Josefin Sans"}}},y:{grid:{color:C.grid},ticks:{color:C.mute,font:{family:"Josefin Sans"}}}}});
 function markSelects(){ document.querySelectorAll(".field select").forEach(s=>s.classList.toggle("on",s.selectedIndex>0)); $("searchClear").hidden=!$("search").value; $("pSearchClear").hidden=!$("pSearch").value; }
 function render(){
   markSelects();
@@ -55,17 +60,17 @@ function render(){
   // charts follow the filters
   const subs=SUBS.map(k=>{ let m=0,t=0; vis.forEach(r=>{const b=r.summary&&r.summary.bySub&&r.summary.bySub[k]; if(b){m+=b.m;t+=b.t;}}); return t?Math.round(100*m/t):0; });
   mkChart("cSub",{type:"bar",data:{labels:SUBS.map(k=>SUBSHORT[k]),datasets:[{data:subs,backgroundColor:[C.brick,C.gold,C.rose,C.olive,C.mute],borderRadius:5}]},
-    options:{...baseOpts(v=>v+"% mastered"),indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:"#EFECEA"},ticks:{callback:v=>v+"%",color:C.mute}},y:{grid:{display:false},ticks:{color:C.ink,font:{family:"Josefin Sans",weight:"bold"}}}}}});
+    options:{...baseOpts(v=>v+"% mastered"),indexAxis:"y",scales:{x:{min:0,max:100,grid:{color:C.grid},ticks:{callback:v=>v+"%",color:C.mute}},y:{grid:{display:false},ticks:{color:C.ink,font:{family:"Josefin Sans",weight:"bold"}}}}}});
   $("cSub").setAttribute("aria-label","Team mastery by subject: "+SUBS.map((k,i)=>SUBSHORT[k]+" "+subs[i]+"%").join(", "));
   const miss={}; vis.forEach(r=>(r.summary?.weak||[]).forEach(n=>miss[n]=(miss[n]||0)+1));
   const top=Object.entries(miss).sort((a,b)=>b[1]-a[1]).slice(0,8);
   $("missEmpty").textContent=top.length?"":"Nothing flagged yet — this fills in as staff take quizzes.";
   mkChart("cMiss",{type:"bar",data:{labels:top.map(x=>x[0].length>22?x[0].slice(0,21)+"…":x[0]),datasets:[{data:top.map(x=>x[1]),backgroundColor:C.brick,borderRadius:5}]},
-    options:{...baseOpts(v=>v+(v===1?" person":" people")),indexAxis:"y",scales:{x:{beginAtZero:true,ticks:{precision:0,color:C.mute},grid:{color:"#EFECEA"}},y:{grid:{display:false},ticks:{color:C.ink}}}}});
+    options:{...baseOpts(v=>v+(v===1?" person":" people")),indexAxis:"y",scales:{x:{beginAtZero:true,ticks:{precision:0,color:C.mute},grid:{color:C.grid}},y:{grid:{display:false},ticks:{color:C.ink}}}}});
   $("cMiss").setAttribute("aria-label","Most-missed cards: "+(top.length?top.map(x=>`${x[0]} (${x[1]})`).join(", "):"none yet"));
   const bins=[0,0,0,0]; vis.forEach(r=>{const p=r.summary?.pct||0; bins[p>=75?3:p>=50?2:p>=25?1:0]++;});
   mkChart("cDist",{type:"bar",data:{labels:["0–24%","25–49%","50–74%","75–100%"],datasets:[{data:bins,backgroundColor:[C.line,C.gold,C.rose,C.olive],borderRadius:5}]},
-    options:{...baseOpts(v=>v+(v===1?" person":" people")),scales:{y:{beginAtZero:true,ticks:{precision:0,color:C.mute},grid:{color:"#EFECEA"}},x:{grid:{display:false},ticks:{color:C.ink}}}}});
+    options:{...baseOpts(v=>v+(v===1?" person":" people")),scales:{y:{beginAtZero:true,ticks:{precision:0,color:C.mute},grid:{color:C.grid}},x:{grid:{display:false},ticks:{color:C.ink}}}}});
   $("cDist").setAttribute("aria-label","Staff by mastery range: "+["0–24%","25–49%","50–74%","75–100%"].map((l,i)=>`${l}: ${bins[i]}`).join(", "));
   // table
   const key=r=>sortK==="name"?r.name.toLowerCase():sortK==="quiz"?(qpct(r)??-1):sortK==="updated"?(r.updated||0):(r.summary?.pct||0);

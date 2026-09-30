@@ -45,3 +45,8 @@ Env vars: `BLOB_READ_WRITE_TOKEN` (from the Blob store), `MANAGER_PIN`.
 
 - Quiz rounds are 10 questions (was 30) — short enough for a break.
 - "Which dish / drink is this?" picture questions only use real photos. Items without a live photo are never asked from their drawing; once a manager uploads and confirms a photo in Manager → Photos, that item starts showing up in picture questions automatically.
+
+## v4.3.2 (Sep 2026) — plate photos
+
+- Live photos for 10 more dishes: Tortilla Española, Sardinas, Tarta de Queso, Flor de Alcachofa, Gambas, Pepa en Adobo, Marinera Fideuà, Primavera, Pimientos de Padrón, Buñuelos de Bacalao. They ship as static files (`img/p-<photo id>.webp`) registered in `PHOTO_SEED` (`js/photos.js`), so they don't add weight to the page until shown.
+- With the 5 already uploaded in Manager → Photos (Quesos y Charcutería, Torrijas, Tarta de Santiago, AvenChurros, Goxua), 15 of 42 dishes now have photos and appear in picture questions. A photo uploaded in Manager → Photos still wins over these, so any of them can be replaced or hidden from the board.

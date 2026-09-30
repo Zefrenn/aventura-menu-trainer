@@ -311,7 +311,7 @@ if(!x.includes(f.a.toLowerCase())&&!words.some(w=>x.includes(w))) return esc(f.x
 }
 return shapeHint(f.a);
 }
-// q.vis: "id" photo is the question · "illus" drawing is the question · "q" photo shown with the question
+// q.vis: "id" real photo is the question (only when a live photo exists) · "q" photo shown with the question
 //        "after" photo shown once answered (it would give the answer away, e.g. glass or garnish)
 function makeQuestion(c){
 let q;
@@ -334,8 +334,6 @@ if(d.colors.length) types.push(()=>({prompt:`Batch bottle color for <b>${esc(d.n
 hint:`${K.tape?esc(K.tape)+" ":""}${d.colors.length===1?"A single tape color":"Two tape colors"}. One wrong answer is crossed out.`}));
 if(photoOf("d",d.name)){ const pq=()=>({prompt:`Which drink is this?`,answer:d.name,opts:distractors(d.name,all.filter(x=>x.glass.split(" ")[0]===d.glass.split(" ")[0]).map(x=>x.name),3,all.map(x=>x.name)),vis:"id",
 hint:K.id?esc(K.id):`${esc(d.cat)} · <i>${esc(d.menu)}</i>`}); types.push(pq,pq); }
-else if(ILLUS[d.name]) types.push(()=>({prompt:`Which drink is served like this?`,answer:d.name,opts:distractors(d.name,all.map(x=>x.name)),vis:"illus",
-hint:K.id?esc(K.id):`${esc(d.cat)} · ${nameShape(d.name)}`}));
 q=pick(types)(); q.explain=`${d.name}: ${d.glass} · ${d.build.join(" · ")} · garnish ${d.garnish}.`;
 } else if(c.kind==="food"){
 const f=c.fd, all=FOOD, K=COACH.food[f.name]||{}, major=f.all.split("·")[0].split(",").map(a=>a.trim()).filter(a=>MAJOR.test(a));
@@ -349,8 +347,6 @@ hint:priceHint(f.price,all.filter(x=>x.cat===f.cat).map(x=>x.price),f.cat)+" One
 ];
 if(photoOf("f",f.name)){ const pq=()=>({prompt:`Which dish is this?`,answer:f.name,opts:distractors(f.name,all.filter(x=>x.cat===f.cat).map(x=>x.name),3,all.map(x=>x.name)),vis:"id",
 hint:K.id?esc(K.id):`${esc(f.cat)} · ${nameShape(f.name)}`}); types.push(pq,pq); }
-else types.push(()=>({prompt:`Which dish is served like this?`,answer:f.name,opts:distractors(f.name,all.filter(x=>x.ill===f.ill).map(x=>x.name),3,all.map(x=>x.name)),vis:"illus",
-hint:K.id?esc(K.id):`${esc(f.cat)} · ${esc(money(f.price))} · ${nameShape(f.name)}`}));
 if(f.mods!=="None") types.push(()=>({prompt:`Approved mods for <b>${esc(f.name)}</b>?`,answer:f.mods,opts:distractors(f.mods,all.filter(x=>x.mods!=="None").map(x=>x.mods)),vis:"q",
 hint:K.mods?esc(K.mods):major.length?`A mod usually takes out an allergen. This dish has: ${esc(major.join(", "))}.`:`Think about what a guest would most often ask to leave off.`}));
 if(!/^None/.test(f.ut)) types.push(()=>({prompt:`What drops with <b>${esc(f.name)}</b>?`,answer:f.ut,opts:distractors(f.ut,all.map(x=>x.ut)),vis:"q",
@@ -400,9 +396,8 @@ function hookOf(c){ const K=c.kind==="drink"?COACH.drink[c.d.name]:c.kind==="foo
 function itemOf(c){ return c.kind==="drink"?{pk:"d",name:c.d.name}:c.kind==="food"?{pk:"f",name:c.fd.name}:c.kind==="wine"?{pk:null,name:c.w.name}:{pk:null,name:null}; }
 function promptHTML(q,c){
 const {pk,name}=itemOf(c);
-const drawing=()=>c.kind==="drink"?`<div class="qillus">${ILLUS[name]||""}</div>`:c.kind==="food"?`<div class="qillus"><div class="fillus">${FOODILLUS[c.fd.ill]||""}</div></div>`:"";
-if(q.vis==="id") return q.prompt+(visual(pk,name,"","","q")||drawing());
-if(q.vis==="illus") return q.prompt+drawing();
+// "which dish / drink is this?" only ever uses a real photo — drawings don't show the ingredients well enough
+if(q.vis==="id") return q.prompt+visual(pk,name,"","","q");
 if(q.vis==="q"&&pk) return visual(pk,name,"","","qs")+q.prompt;
 return q.prompt;
 }
@@ -410,7 +405,7 @@ return q.prompt;
 // queue entries are {k: card key, q: the exact question once asked}. Missed/skipped keep the exact
 // question, so "Retry" re-asks what you missed (not a new random question about the same item).
 // The round is saved per trainee, so a reload or a phone killing the tab doesn't lose it.
-const ROUND_MAX=30;
+const ROUND_MAX=10; // short rounds — about one break's worth
 const CARDBYKEY=new Map(CARDS.map(c=>[cardKey(c),c]));
 let round={queue:[],i:0,right:0,answered:0,missed:[],skipped:[],cycle:new Set(),label:"",retry:false,done:false}, hintUsed=false;
 const RKEY=()=>me?"av_round_"+me.slug:null;
@@ -448,7 +443,9 @@ showPlay(); showQuestion();
 const KEYS=["A","B","C","D","E","F"];
 function showQuestion(){
 const e=round.queue[round.i], c=CARDBYKEY.get(e.k);
-if(!e.q) e.q=makeQuestion(c); else e.q.choices=shuffleArr(e.q.choices.slice());
+// a saved picture question with no live photo (or an old drawing question) gets a fresh question instead
+const it=itemOf(c), noPic=e.q&&(e.q.vis==="illus"||(e.q.vis==="id"&&!(it.pk&&photoOf(it.pk,it.name))));
+if(!e.q||noPic) e.q=makeQuestion(c); else e.q.choices=shuffleArr(e.q.choices.slice());
 currentQ={...e.q,card:c}; answered=false; hintUsed=false;
 $("qCat").textContent=filterLabel()+(round.retry?" · retry":""); $("qPos").textContent=`Question ${round.i+1} of ${round.queue.length}`;
 $("qBar").style.width=(100*round.i/round.queue.length)+"%";

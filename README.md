@@ -40,3 +40,8 @@ Env vars: `BLOB_READ_WRITE_TOKEN` (from the Blob store), `MANAGER_PIN`.
 - Every quiz hint is now written against the Aventura menu for someone with no restaurant background (`js/coach.js`): Spanish word clues for dish names ("pulpo" = octopus), plain-English glass guides, garnish and build nudges, batch-tape memory tricks, allergen "triggers" pulled from each dish's ingredients (baguette → gluten, aioli → egg), where each allergen hides on our menu, and a written hint for every guide and allergen card.
 - After each question, a **Remember it** line gives the one sentence worth keeping about that dish, drink or wine. The full details sit underneath in small print.
 - Hints never state the answer: a check runs every question type against every card (632 questions, 0 leaks).
+
+## v4.3.1 (Sep 2026)
+
+- Quiz rounds are 10 questions (was 30) — short enough for a break.
+- "Which dish / drink is this?" picture questions only use real photos. Items without a live photo are never asked from their drawing; once a manager uploads and confirms a photo in Manager → Photos, that item starts showing up in picture questions automatically.

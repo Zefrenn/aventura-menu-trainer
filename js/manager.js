@@ -32,7 +32,7 @@ async function load(){
   if(r.status===401){ $("err").textContent="That PIN didn't work. Check it and try again."; sessionStorage.removeItem("av_pin"); $("pin").select(); return false; }
   if(!r.ok){ $("err").textContent="Could not load ("+r.status+")."; return false; }
   rows=(await r.json()).sort((a,b)=>(b.summary?.pct||0)-(a.summary?.pct||0)); sessionStorage.setItem("av_pin",pin);
-  $("gate").classList.add("hidden"); $("board").classList.remove("hidden"); render(); loadPhotoIndex().then(()=>{ countPhotos(); if(!$("photos").classList.contains("hidden")) renderPhotos(); });
+  $("gate").classList.add("hidden"); $("board").classList.remove("hidden"); render(); qzLoad().then(()=>{ if(!$("quizzes").classList.contains("hidden")) renderQuizzes(); }); loadPhotoIndex().then(()=>{ countPhotos(); if(!$("photos").classList.contains("hidden")) renderPhotos(); });
   return true;
 }
 // ---------- team ----------
@@ -56,7 +56,7 @@ function render(){
   $("kN").textContent=all.length; $("kNs").textContent=all.length===1?"trainee":"trainees";
   $("kM").textContent=(all.length?Math.round(all.reduce((a,r)=>a+(r.summary?.pct||0),0)/all.length):0)+"%"; { const tot=Math.max(0,...all.map(r=>r.summary?.total||0)); $("kCards").textContent=tot?`of ${tot} cards`:"of all cards"; }
   $("kA").textContent=act; $("kAs").textContent=all.length?`of ${all.length}`:"";
-  $("kQ").textContent=qs.t?Math.round(100*qs.r/qs.t)+"%":"—"; $("kQs").textContent=qs.t?`${qs.t} answers`:"no quiz answers yet";
+  $("kQ").textContent=qs.t?Math.round(100*qs.r/qs.t)+"%":"—"; $("kQs").textContent=qs.t?`${qs.t} quiz answers`:"no quizzes taken yet";
   // charts follow the filters
   const subs=SUBS.map(k=>{ let m=0,t=0; vis.forEach(r=>{const b=r.summary&&r.summary.bySub&&r.summary.bySub[k]; if(b){m+=b.m;t+=b.t;}}); return t?Math.round(100*m/t):0; });
   mkChart("cSub",{type:"bar",data:{labels:SUBS.map(k=>SUBSHORT[k]),datasets:[{data:subs,backgroundColor:[C.brick,C.gold,C.rose,C.olive,C.mute],borderRadius:5}]},
@@ -64,7 +64,7 @@ function render(){
   $("cSub").setAttribute("aria-label","Team mastery by subject: "+SUBS.map((k,i)=>SUBSHORT[k]+" "+subs[i]+"%").join(", "));
   const miss={}; vis.forEach(r=>(r.summary?.weak||[]).forEach(n=>miss[n]=(miss[n]||0)+1));
   const top=Object.entries(miss).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  $("missEmpty").textContent=top.length?"":"Nothing flagged yet — this fills in as staff take quizzes.";
+  $("missEmpty").textContent=top.length?"":"Nothing flagged yet — this fills in as staff study in Learn.";
   mkChart("cMiss",{type:"bar",data:{labels:top.map(x=>x[0].length>22?x[0].slice(0,21)+"…":x[0]),datasets:[{data:top.map(x=>x[1]),backgroundColor:C.brick,borderRadius:5}]},
     options:{...baseOpts(v=>v+(v===1?" person":" people")),indexAxis:"y",scales:{x:{beginAtZero:true,ticks:{precision:0,color:C.mute},grid:{color:C.grid}},y:{grid:{display:false},ticks:{color:C.ink}}}}});
   $("cMiss").setAttribute("aria-label","Most-missed cards: "+(top.length?top.map(x=>`${x[0]} (${x[1]})`).join(", "):"none yet"));
@@ -99,7 +99,7 @@ function detailPanel(r,s,q){
   const subs=SUBS.map(k=>{const b=s.bySub&&s.bySub[k]; const w=b&&b.t?Math.round(100*b.m/b.t):0; return `<div class="r"><span>${esc(SUBSHORT[k])}</span><div class="bar"><i style="width:${w}%"></i></div><span class="v">${w}% · ${b?b.m:0}/${b?b.t:0}</span></div>`;}).join("");
   const weak=(s.weak||[]).length?`<div class="wchips">${s.weak.map(w=>`<span>${esc(w)}</span>`).join("")}</div>`:`<span class="mini">Nothing flagged — no wrong answers or “learning” cards yet.</span>`;
   return `<div class="dpanel"><div><h4>By subject</h4><div class="dsub">${subs}</div></div>
-    <div><div class="dfacts"><div><b>Quiz</b>${q===null?"No answers yet":`${q}% · ${s.quiz.right}/${s.quiz.total} right`}</div><div><b>Mastered</b>${s.mastered||0} of ${s.total||0} cards</div><div><b>Last active</b>${ago(r.updated)}<div class="mini">${fmtDate(r.updated)}</div></div><div><b>Started</b>${fmtDate(r.started)}</div></div>
+    <div><div class="dfacts"><div><b>Quizzes</b>${q===null?"None taken yet":`${q}% · ${s.quiz.right}/${s.quiz.total} right`}${Object.values(s.quizzes||{}).map(x=>`<div class="mini">${esc(x.title)}: ${x.best.right}/${x.best.total}</div>`).join("")}</div><div><b>Learn</b>${s.learn&&s.learn.total?`${s.learn.total} questions answered`:"Not started"}</div><div><b>Mastered</b>${s.mastered||0} of ${s.total||0} cards</div><div><b>Last active</b>${ago(r.updated)}<div class="mini">${fmtDate(r.updated)}</div></div><div><b>Started</b>${fmtDate(r.started)}</div></div>
     <h4 style="margin-top:14px">Needs work</h4>${weak}</div>
     <div class="acts full"><button class="btn sm copy1">${ico("copy")}Copy ${esc(r.name.split(" ")[0])}'s summary</button></div></div>`;
 }
@@ -124,9 +124,9 @@ const FCATS=[...new Set(FOOD.map(f=>f.cat))], DCATS=[...new Set(DRINKS.map(d=>d.
 let pTarget=null, pOpen={}, pLast=null;
 $("pBy").value=localStorage.getItem("av_photo_by")||"";
 $("pBy").oninput=()=>localStorage.setItem("av_photo_by",$("pBy").value.trim());
-function setMode(m){ $("mTeam").classList.toggle("on",m==="team"); $("mPhotos").classList.toggle("on",m==="photos"); $("mTeam").setAttribute("aria-pressed",m==="team"); $("mPhotos").setAttribute("aria-pressed",m==="photos");
-  $("team").classList.toggle("hidden",m!=="team"); $("photos").classList.toggle("hidden",m!=="photos"); if(m==="photos") loadPhotos(); }
-$("mTeam").onclick=()=>setMode("team"); $("mPhotos").onclick=()=>setMode("photos");
+function setMode(m){ [["mTeam","team"],["mQuiz","quizzes"],["mPhotos","photos"]].forEach(([b,id])=>{ $(b).classList.toggle("on",m===id); $(b).setAttribute("aria-pressed",m===id); $(id).classList.toggle("hidden",m!==id); });
+  if(m==="photos") loadPhotos(); if(m==="quizzes"){ qzLoad().then(renderQuizzes); } }
+$("mTeam").onclick=()=>setMode("team"); $("mQuiz").onclick=()=>setMode("quizzes"); $("mPhotos").onclick=()=>setMode("photos");
 async function loadPhotos(){ say("Loading photos…",true); await loadPhotoIndex(); say(""); renderPhotos(); }
 function photoRows(){ return PITEMS.map(it=>{ const p=photoOf(it.kind,it.name,true); return {it,p,st:p?p.status:"none"}; }); }
 function countPhotos(){ let nF=0,nD=0,nP=0; photoRows().forEach(({it,st})=>{ if(st==="ok"){ if(it.kind==="f")nF++; else nD++; } if(st==="pending") nP++; });

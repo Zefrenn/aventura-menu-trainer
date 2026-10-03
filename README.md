@@ -1,12 +1,14 @@
 # Aventura Menu Trainer
 
-Staff training app for Aventura (Ann Arbor): cocktails, wines by the glass, food menu, allergens & dietary guide, quiz rounds, and per-person progress.
+Staff training app for Aventura (Ann Arbor): cocktails, wines by the glass, food menu, allergens & dietary guide, Learn mode, manager-set quizzes, and per-person progress.
 
-- `/` — the trainer (staff enter their name; progress saves under it)
+- `/` — the trainer (staff enter a name, initials or nickname; progress saves under it)
 - `/manager` — PIN-protected team board
+- `/manager` → **Quizzes** — create, edit, schedule, close quizzes; see results
 - `/manager` → **Photos** — add/replace/confirm/hide dish & drink photos from your phone
 - `api/photo.js` — photo index + images in Vercel Blob (`photos/<id>.webp|jpg`, `photos/index.json`)
 - `api/progress.js` — reads/writes one JSON per trainee in Vercel Blob (`trainees/<slug>.json`)
+- `api/quizzes.js` — manager quizzes in Vercel Blob (`config/quizzes.json`); staff only receive live ones
 
 Env vars: `BLOB_READ_WRITE_TOKEN` (from the Blob store), `MANAGER_PIN`.
 
@@ -50,3 +52,15 @@ Env vars: `BLOB_READ_WRITE_TOKEN` (from the Blob store), `MANAGER_PIN`.
 
 - Live photos for 10 more dishes: Tortilla Española, Sardinas, Tarta de Queso, Flor de Alcachofa, Gambas, Pepa en Adobo, Marinera Fideuà, Primavera, Pimientos de Padrón, Buñuelos de Bacalao. They ship as static files (`img/p-<photo id>.webp`) registered in `PHOTO_SEED` (`js/photos.js`), so they don't add weight to the page until shown.
 - With the 5 already uploaded in Manager → Photos (Quesos y Charcutería, Torrijas, Tarta de Santiago, AvenChurros, Goxua), 15 of 42 dishes now have photos and appear in picture questions. A photo uploaded in Manager → Photos still wins over these, so any of them can be replaced or hidden from the board.
+
+## v5.0 (Oct 2026) — Learn mode, manager quizzes, nicknames
+
+Goal: make the app feel low-pressure for brand-new staff, so it helps retention instead of scaring people off.
+
+- **Learn replaces Quiz** in the main nav (Cards · Learn · Progress · Key). Modeled on Quizlet Learn: rounds of up to 7 cards from the chosen section; each card goes *To learn → Learning* (right once) → *Mastered* (right again, on a different question, in a later round). Brand-new cards are shown first ("New · have a look first") before any question. A miss comes back two questions later in the same round. No scores or percentages. A checkpoint after each round shows what moved. Hints and *No sé* still work. Rounds save per trainee, so a closed tab picks up where it left off. When a whole section is mastered: *Review these* or pick another section.
+- **Quizzes only when a manager sets one.** Manager → **Quizzes**: name, message to staff, sections (multi-select), number of questions, hints on/off, your own written multiple-choice questions, draft/live, optional start and end dates. Close, reopen, edit or delete anytime. Results per quiz: who took it, best score, tries, what they missed, most-missed, who hasn't taken it, copy results.
+- Staff see a soft **"Quiz from your manager · whenever you're ready"** button only while a quiz is live. No timer, retakes allowed, the board shows their best score. *Practice missed* afterwards doesn't change the score.
+- **Sign-in takes a name, initials or a nickname.** Casing is kept as typed (all-lowercase initials like "mr" become "MR"). If someone new types a name that already has saved progress, the app asks first so two "Sam"s don't share progress. The gate notes that the manager sees the name on the board.
+- Mastery: Learn level (`lv` per card) now drives mastered / learning. Swiping *Got it* in Cards still marks a card mastered. Old progress carries over.
+- Board: the **Quiz** column / KPI now mean manager-quiz results (best attempt of each). Each person's detail shows their quiz scores and Learn activity. Staff who haven't opened v5 yet still show their old practice-round accuracy there until they next open the app.
+- Shared card / section list moved to `js/sections.js` (used by both pages). Manager quiz code is in `js/manager-quizzes.js`.

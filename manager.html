@@ -108,6 +108,33 @@ header .tag{display:block;border:none;padding:0;background:none;border-radius:0;
 .charts{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px;}
 .cwrap{position:relative;height:200px;} .cwrap.sm{height:160px;}
 
+/* ---- quizzes ---- */
+.qzcard h3.qztitle{margin:8px 0 2px;font-family:var(--disp);font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);}
+.qzcard .qznote{margin:4px 0 6px;font-style:italic;color:var(--gray-2);font-size:15px;}
+.qzhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;}
+.stchip{font-family:var(--disp);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:5px 9px 3px;border-radius:999px;border:1px solid var(--line-2);color:var(--gray-3);}
+.stchip.live{background:var(--good-soft);border-color:var(--good);color:var(--good);} .stchip.sched{background:var(--amber-soft);border-color:var(--amber);color:var(--amber);} .stchip.draft{border-style:dashed;}
+.qzstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px;text-align:center;}
+.qzstats div{background:var(--bg);border-radius:10px;padding:8px 4px 6px;} .qzstats b{display:block;font-family:var(--disp);font-size:20px;color:var(--gray);} .qzstats span{font-family:var(--disp);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-3);}
+.qzacts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;} .btn.warn{color:var(--bad);}
+.qzres{margin-top:12px;border-top:1px solid var(--line);padding-top:10px;} .qzres h4{margin:14px 0 6px;font-family:var(--disp);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose-deep);font-weight:700;}
+.qzres .acts{margin-top:12px;} .qzres .tbl td:first-child{min-width:96px;}
+.qe .lbl{display:block;font-family:var(--disp);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--rose-deep);margin:14px 0 5px;}
+.qe .lbl.ok{color:var(--good);} .qe .opt{font-weight:600;color:var(--gray-3);letter-spacing:.08em;margin-left:4px;}
+.ff{width:100%;min-height:44px;padding:10px 12px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--paper);font-family:var(--body);font-size:16px;color:var(--gray);outline:none;}
+.ff:focus{border-color:var(--gray);} textarea.ff{resize:vertical;line-height:1.4;} .ff::placeholder{color:var(--gray-3);font-style:italic;}
+select.ff{font-family:var(--disp);font-size:13px;letter-spacing:.06em;}
+.secs .secgrp{margin:6px 0 4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;} .secs .secgrp .lbl{width:100%;margin:6px 0 0;color:var(--gray-3);}
+.secchip{padding:8px 12px 6px;border-radius:999px;border:1px solid var(--line-2);background:var(--paper);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gray);}
+.secchip i{font-style:normal;font-family:var(--body);text-transform:none;letter-spacing:0;font-size:13px;color:var(--gray-3);margin-left:3px;}
+.secchip.on{background:var(--ink);border-color:var(--ink);color:var(--on-ink);} .secchip.on i{color:inherit;opacity:.7;}
+.qerow{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;align-items:end;} .qerow .lbl{margin-top:14px;}
+.sw{display:flex;align-items:center;gap:8px;min-height:44px;font-size:15px;} .sw input{width:20px;height:20px;accent-color:var(--gray);}
+.cq{border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 12px 12px;margin-bottom:10px;background:var(--bg);} .cq .ff{margin-bottom:6px;} .cq .lbl{margin-top:6px;}
+.cqhead{display:flex;justify-content:space-between;align-items:center;} .cqhead .lbl{margin:8px 0 4px;}
+.qesum{margin-top:16px;padding:10px 12px;border-radius:10px;background:var(--rose-tint);font-size:15px;line-height:1.45;}
+@media (min-width:760px){ .qerow{grid-template-columns:1fr 1fr 1fr;} }
+
 /* ---- team table ---- */
 .tblwrap{overflow-x:auto;margin:0 -6px;}
 .tbl{width:100%;border-collapse:collapse;font-size:15px;}
@@ -202,8 +229,41 @@ details.grp .glist{border-top:1px solid var(--line);padding:0 14px;}
   <main id="board" class="hidden">
     <nav class="modes" aria-label="Manager sections">
       <button id="mTeam" class="on" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-5-6.3"/></svg>Team<span class="n" id="mTeamN"></span></button>
+      <button id="mQuiz" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>Quizzes<span class="n" id="mQuizN"></span></button>
       <button id="mPhotos" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Photos<span class="n" id="mPhotosN"></span></button>
     </nav>
+
+    <!-- ================= QUIZZES ================= -->
+    <section id="quizzes" class="hidden" aria-label="Quizzes">
+      <div id="qzListWrap">
+        <div class="howto"><span class="eyebrow">How quizzes work</span>Staff study in <b>Learn</b> with no scores or pressure. A quiz only shows up for them when you make one live here, as a short check-in they can take when they're ready (hints allowed unless you turn them off, retakes allowed, you see their best score). Close it when you're done.</div>
+        <div class="bar-row"><h2 class="h-sec" style="margin:0">Quizzes</h2><button class="btn gold sm" id="qzNew"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>New quiz</span></button></div>
+        <div id="qzList"></div>
+      </div>
+      <div id="qzEditor" class="hidden">
+        <div class="q qe">
+          <h2 class="h-sec" id="qeHead">New quiz</h2>
+          <label class="lbl" for="qeTitle">Name</label><input id="qeTitle" class="ff" maxlength="80" placeholder="e.g. Fall cocktails check-in">
+          <label class="lbl" for="qeNote">Message to staff <span class="opt">optional</span></label><textarea id="qeNote" class="ff" rows="2" maxlength="400" placeholder="e.g. New fall menu starts Friday. Take this before your next shift."></textarea>
+          <span class="lbl">What it covers</span><div class="mini" style="margin-bottom:6px">Tap one or more sections. Questions are picked at random from these cards.</div>
+          <div id="qeSecs" class="secs"></div>
+          <div class="qerow">
+            <div><label class="lbl" for="qeCount">Questions</label><select id="qeCount" class="ff"><option>5</option><option>8</option><option selected>10</option><option>12</option><option>15</option><option>20</option><option>25</option><option>30</option></select></div>
+            <div><span class="lbl">Hints</span><label class="sw"><input type="checkbox" id="qeHints" checked><span>Allow Pista · Hint</span></label></div>
+          </div>
+          <span class="lbl" style="margin-top:16px">Your own questions <span class="opt">optional</span></span><div class="mini" style="margin-bottom:6px">Anything not on the menu cards: steps of service, policies, this week's specials. Multiple choice — one right answer, up to three wrong.</div>
+          <div id="qeCustom"></div>
+          <button type="button" class="btn sm" id="qeAdd"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Add a question</span></button>
+          <div class="qerow" style="margin-top:16px">
+            <div><label class="lbl" for="qeStatus">Staff can see it</label><select id="qeStatus" class="ff"><option value="draft">Not yet (draft)</option><option value="live">Yes, make it live</option></select></div>
+            <div><label class="lbl" for="qeFrom">Starting <span class="opt">optional</span></label><input type="date" id="qeFrom" class="ff"></div>
+            <div><label class="lbl" for="qeUntil">Open until <span class="opt">optional</span></label><input type="date" id="qeUntil" class="ff"></div>
+          </div>
+          <div class="qesum" id="qeSum" aria-live="polite"></div>
+          <div class="nav"><button class="btn" id="qeCancel">Cancel</button><button class="btn gold" id="qeSave"><svg class="i" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Save draft</span></button></div>
+        </div>
+      </div>
+    </section>
 
     <!-- ================= PHOTOS ================= -->
     <section id="photos" class="hidden" aria-label="Photos">
@@ -230,7 +290,7 @@ details.grp .glist{border-top:1px solid var(--line);padding:0 14px;}
         <div class="q"><div class="eyebrow">Staff</div><div class="big" id="kN">0</div><div class="mini" id="kNs">&nbsp;</div></div>
         <div class="q"><div class="eyebrow">Avg mastery</div><div class="big" id="kM">0%</div><div class="mini" id="kCards">of all cards</div></div>
         <div class="q"><div class="eyebrow">Active · 7 days</div><div class="big" id="kA">0</div><div class="mini" id="kAs">&nbsp;</div></div>
-        <div class="q"><div class="eyebrow">Quiz accuracy</div><div class="big" id="kQ">—</div><div class="mini" id="kQs">&nbsp;</div></div>
+        <div class="q"><div class="eyebrow">Quiz average</div><div class="big" id="kQ">—</div><div class="mini" id="kQs">&nbsp;</div></div>
       </div>
       <div class="tools">
         <div class="field grow"><svg class="i lead" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><label class="vh" for="search">Search staff</label><input id="search" placeholder="Search a name" autocomplete="off"><button class="clear" id="searchClear" aria-label="Clear search" hidden><svg class="i" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button></div>
@@ -283,7 +343,11 @@ details.grp .glist{border-top:1px solid var(--line);padding:0 14px;}
 <script src="/js/illus.js"></script>
 <script src="/js/drinks.js"></script>
 <script src="/js/food.js"></script>
+<script src="/js/guide.js"></script>
+<script src="/js/allergy.js"></script>
+<script src="/js/sections.js"></script>
 <script src="/js/photos-seed.js"></script>
 <script src="/js/photos.js"></script>
 <script src="/js/manager.js"></script>
+<script src="/js/manager-quizzes.js"></script>
 </body></html>

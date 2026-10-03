@@ -59,7 +59,9 @@ export default async function handler(req, res) {
       const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
       const slug = slugify(body && body.name);
       if (!slug || !body.items) return res.status(400).json({ error: "bad body" });
-      const doc = { name: String(body.name).trim().slice(0,40), slug, items: body.items, quiz: body.quiz || {right:0,total:0}, started: body.started || Date.now(), updated: Date.now(), summary: body.summary || null };
+      const obj = v => (v && typeof v === "object" && !Array.isArray(v)) ? v : null;
+      // learn = Learn-mode answer counts · quizzes = results of manager-assigned quizzes, by quiz id
+      const doc = { name: String(body.name).trim().slice(0,40), slug, items: body.items, quiz: body.quiz || {right:0,total:0}, learn: obj(body.learn) || {right:0,total:0}, quizzes: obj(body.quizzes) || {}, started: body.started || Date.now(), updated: Date.now(), summary: body.summary || null };
       const s = JSON.stringify(doc);
       if (s.length > 400_000) return res.status(413).json({ error: "too large" });
       await put(PREFIX + slug + ".json", s, { access: ACCESS, addRandomSuffix: false, allowOverwrite: true, contentType: "application/json", ...creds() });

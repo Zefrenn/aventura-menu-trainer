@@ -1,6 +1,6 @@
 {
   "name": "aventura-menu-trainer",
-  "version": "4.3.2",
+  "version": "5.0.0",
   "private": true,
   "type": "module",
   "dependencies": {

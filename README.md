@@ -9,6 +9,8 @@ Staff training app for Aventura (Ann Arbor): cocktails, wines by the glass, food
 - `api/photo.js` — photo index + images in Vercel Blob (`photos/<id>.webp|jpg`, `photos/index.json`)
 - `api/progress.js` — reads/writes one JSON per trainee in Vercel Blob (`trainees/<slug>.json`)
 - `api/quizzes.js` — manager quizzes in Vercel Blob (`config/quizzes.json`); staff only receive live ones
+- `/manager` → **Menu** — edit every drink, dish, wine, guide card, allergen card, hint, diet flag, tape color and the menu dates; publish to staff
+- `api/content.js` — published menu edits in Vercel Blob (`config/content.json`, every version in `config/content-history/`, log in `config/content-log.json`)
 
 Env vars: `BLOB_READ_WRITE_TOKEN` (from the Blob store), `MANAGER_PIN`.
 
@@ -64,3 +66,20 @@ Goal: make the app feel low-pressure for brand-new staff, so it helps retention 
 - Mastery: Learn level (`lv` per card) now drives mastered / learning. Swiping *Got it* in Cards still marks a card mastered. Old progress carries over.
 - Board: the **Quiz** column / KPI now mean manager-quiz results (best attempt of each). Each person's detail shows their quiz scores and Learn activity. Staff who haven't opened v5 yet still show their old practice-round accuracy there until they next open the app.
 - Shared card / section list moved to `js/sections.js` (used by both pages). Manager quiz code is in `js/manager-quizzes.js`.
+
+## v5.1 (Oct 2026) — edit the menu from the browser
+
+Goal: any manager can keep the trainer current without touching code, and the restaurant can take it over.
+
+- **Manager → Menu** tab. Pick Drinks · Food · Wines · Guide · Allergens · Settings, search or filter by section, tap any item to edit it, or add one. Works on a phone.
+- Every field staff see is editable: names, prices, descriptions, builds, glass, garnish, batch tape, ingredients, allergens, mods, utensils, diet flags (Yes / With a mod), diet notes, wine details, guide and allergen Q&A. Optional **Hints & "Remember it"** per item (blank = the app writes its own hint).
+- New sections: pick **+ New section…** on a drink, dish or guide card; it shows up in the trainer's section picker and in quiz setup.
+- **Settings**: the menu-date line under the logo, batch tape colors (add / recolor / remove unused), "where allergens hide" hints, diet explanations.
+- **Draft, then publish.** Edits save as a draft on that device (survive a reload) with a count of unpublished changes; **Publish** asks for a name and optional note. Phones load the new menu next time the app opens, and an open trainer shows "Menu updated · tap to load it" when the phone comes back to it.
+- **Renaming is safe**: a renamed item keeps everyone's progress, its photo and its drawing (old names are stored in `_was`). New drinks can borrow a glass drawing.
+- **Two managers at once**: if someone published after you started, you choose "Publish mine anyway" or "Use theirs".
+- **Versions & backup**: open any earlier published version (or the original built-in menu) as a draft and republish it; download / load a JSON backup.
+
+How it works: the data files (`js/drinks.js`, `food.js`, `guide.js`, `allergy.js`, `diet.js`, `coach.js`) are still the built-in menu. `js/content.js` fetches published edits and swaps them into those same arrays before the app starts (`index.html` / `manager.html` load the app scripts through it via `data-then`). Only sections that differ from the built-in files are published, so a section nobody edited keeps following the code. **Once a section is published from the board, the board is the source of truth for it**: code edits to that section's file won't show until someone opens "Original built-in menu" in Versions and republishes it.
+
+Handing it over: a new owner needs the manager PIN (Vercel env `MANAGER_PIN`) and nothing else to run the menu day to day. To move hosting, they need the GitHub repo, a Vercel project with a Blob store (`BLOB_READ_WRITE_TOKEN`) and `MANAGER_PIN`; load a downloaded backup in Manager → Menu → Load a backup and publish.

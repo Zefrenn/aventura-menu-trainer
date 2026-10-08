@@ -56,7 +56,7 @@ Object.keys(me.items).forEach(k=>{ const L=me.items[k], R=merged.items[k]; if(!R
 const lq=me.quiz||{right:0,total:0}, rq=remote.quiz||{right:0,total:0}; merged.quiz=(lq.total>rq.total)?lq:rq;
 const ll=me.learn||{right:0,total:0}, rl=remote.learn||{right:0,total:0}; merged.learn=(ll.total>rl.total)?ll:rl;
 merged.quizzes=Object.assign({},remote.quizzes||{}); Object.entries(me.quizzes||{}).forEach(([id,x])=>{ const y=merged.quizzes[id]; if(!y||(x.tries||0)>(y.tries||0)) merged.quizzes[id]=x; });
-merged.name=me.name; merged.slug=me.slug; merged.started=Math.min(merged.started||Date.now(),me.started||Date.now());
+if(typeof AVContent!=="undefined") AVContent.migrate(merged.items); merged.name=me.name; merged.slug=me.slug; merged.started=Math.min(merged.started||Date.now(),me.started||Date.now());
 me=merged; score={right:me.quiz.right,total:me.quiz.total}; store.profiles[me.slug]=me; saveStore(store); resetDeck(); afterProfile(); }
 SYNC=true; cloudSay("synced"); $("pWhere").textContent="Progress is saved under your name — pick up on any device.";
 dirty=true; flush();
@@ -68,7 +68,7 @@ return t.replace(/(^|\s)(\S)/g,(m,s,ch)=>s+ch.toUpperCase()); }
 function setProfile(name){
 const sl=slug(name); if(!sl) return false;
 me=store.profiles[sl]||{name:prettyName(name),slug:sl,items:{},quiz:{right:0,total:0},started:Date.now()};
-if(!me.learn) me.learn={right:0,total:0}; if(!me.quizzes) me.quizzes={};
+if(!me.learn) me.learn={right:0,total:0}; if(!me.quizzes) me.quizzes={}; if(typeof AVContent!=="undefined") AVContent.migrate(me.items);
 score={right:me.quiz.right,total:me.quiz.total};
 $("whoName").textContent=me.name; $("gate").classList.add("hidden");
 L={filter:undefined,items:[],queue:[],done:[],start:{},roundNo:0,review:false,state:"idle"}; activeQuiz=null; round.queue=[];

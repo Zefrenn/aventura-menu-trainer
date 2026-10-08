@@ -135,6 +135,53 @@ select.ff{font-family:var(--disp);font-size:13px;letter-spacing:.06em;}
 .qesum{margin-top:16px;padding:10px 12px;border-radius:10px;background:var(--rose-tint);font-size:15px;line-height:1.45;}
 @media (min-width:760px){ .qerow{grid-template-columns:1fr 1fr 1fr;} }
 
+.modes button{white-space:nowrap;}
+@media (max-width:520px){ .modes button{letter-spacing:.06em;font-size:10.5px;gap:4px;padding-left:2px;padding-right:2px;} .modes button svg.i{display:none;} }
+/* ---- menu editor ---- */
+.clive{display:flex;gap:6px;align-items:flex-start;font-size:14.5px;color:var(--gray-2);margin:0 0 10px;line-height:1.4;} .clive svg.i{margin-top:3px;color:var(--rose-deep);}
+.csets button i{font-style:normal;font-family:var(--body);text-transform:none;letter-spacing:0;font-size:13px;opacity:.7;}
+.csets button .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block;margin-left:2px;}
+.crow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--line);padding:11px 0;min-height:52px;font:inherit;color:inherit;}
+.crow:last-child{border-bottom:none;} .crow:hover .cn{color:var(--rose-deep);}
+.crow .ct{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;} .crow .cn{font-family:var(--body);font-size:16px;line-height:1.25;}
+.crow .mini{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .crow>svg.i{color:var(--gray-3);}
+details.grp summary .gcount b.chg{color:var(--amber);}
+.gone{margin-top:10px;} .gone .grow2{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);} .gone .grow2:last-child{border-bottom:none;}
+.fhelp{font-size:13.5px;color:var(--gray-3);font-style:italic;margin-top:4px;line-height:1.35;}
+.cwarn{color:var(--bad);font-size:14.5px;margin-top:10px;min-height:0;} .cwarn:empty{display:none;}
+.cpx{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.ceacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;justify-content:center;}
+.btn.armed{background:var(--bad-soft);color:var(--bad);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+details.hints{margin-top:16px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg);}
+details.hints summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);flex-wrap:wrap;}
+details.hints summary::-webkit-details-marker{display:none;} details.hints summary .mini{text-transform:none;letter-spacing:.02em;font-weight:400;}
+details.hints summary svg.chev{color:var(--rose-deep);transition:transform .2s var(--ease);} details.hints[open] summary svg.chev{transform:rotate(180deg);}
+details.hints .hbody{padding:0 12px 12px;} details.hints .hbody .lbl:first-child{margin-top:0;}
+.tapes{display:flex;flex-wrap:wrap;gap:6px;}
+.tapebtn{display:inline-flex;align-items:center;gap:6px;padding:7px 11px 5px 7px;border-radius:999px;border:1px solid var(--line-2);background:var(--paper);font-size:10.5px;font-weight:700;letter-spacing:.08em;min-height:36px;color:var(--gray-2);}
+.tapebtn .sw2{width:18px;height:18px;border-radius:50%;border:1px solid var(--line-2);display:inline-block;}
+.tapebtn[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink);color:var(--gray);}
+.tapebtn i{font-style:normal;font-family:var(--body);font-size:12px;background:var(--ink);color:var(--on-ink);border-radius:50%;width:17px;height:17px;display:inline-flex;align-items:center;justify-content:center;}
+.diets{display:flex;flex-direction:column;gap:6px;}
+.drow{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:15px;flex-wrap:wrap;}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden;background:var(--paper);}
+.seg button{border:none;background:none;padding:8px 11px 6px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gray-3);min-height:36px;}
+.seg button+button{border-left:1px solid var(--line-2);}
+.seg button[aria-checked="true"]{background:var(--ink);color:var(--on-ink);}
+.seg button[data-v="m"][aria-checked="true"]{background:var(--amber);color:#fff;}
+.taperow{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);}
+.taperow input[type=color],.tcolin{width:40px;height:36px;border:1px solid var(--line-2);border-radius:8px;padding:2px;background:var(--paper);}
+.taperow .tn{font-family:var(--disp);font-size:12px;font-weight:700;letter-spacing:.08em;min-width:70px;} .taperow .mini{flex:1;}
+.cmore{margin-top:14px;} .cmore .acts{display:flex;flex-wrap:wrap;gap:8px;}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px;} .hrow:last-child{border-bottom:none;} .hrow .ct{flex:1;min-width:0;}
+#cHist{margin-top:8px;}
+.pubbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + var(--sab));width:calc(100% - 20px);max-width:560px;background:var(--paper);border:1px solid var(--rose);border-radius:20px;box-shadow:var(--shadow-lg);padding:10px 10px 10px 16px;z-index:70;}
+.pubmain{display:flex;align-items:center;gap:8px;}
+.pubn{flex:1;min-width:0;display:flex;flex-direction:column;font-size:14px;line-height:1.3;} .pubn b{font-family:var(--disp);font-size:12px;letter-spacing:.08em;text-transform:uppercase;} .pubn span{color:var(--gray-3);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;} .pubn .stale{color:var(--amber);white-space:normal;}
+.pubform .lbl{margin-top:4px;} .pubform .nav{margin-top:8px;}
+body.haspub .wrap{padding-bottom:140px;} body.haspub .toast{bottom:calc(96px + var(--sab));}
+
 /* ---- team table ---- */
 .tblwrap{overflow-x:auto;margin:0 -6px;}
 .tbl{width:100%;border-collapse:collapse;font-size:15px;}
@@ -231,6 +278,7 @@ details.grp .glist{border-top:1px solid var(--line);padding:0 14px;}
       <button id="mTeam" class="on" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-5-6.3"/></svg>Team<span class="n" id="mTeamN"></span></button>
       <button id="mQuiz" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/></svg>Quizzes<span class="n" id="mQuizN"></span></button>
       <button id="mPhotos" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>Photos<span class="n" id="mPhotosN"></span></button>
+      <button id="mMenu" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/></svg>Menu<span class="n" id="mMenuN"></span></button>
     </nav>
 
     <!-- ================= QUIZZES ================= -->
@@ -285,6 +333,36 @@ details.grp .glist{border-top:1px solid var(--line);padding:0 14px;}
     </section>
 
     <!-- ================= TEAM ================= -->
+    <section id="content" class="hidden" aria-label="Edit the menu">
+      <div class="howto"><span class="eyebrow">Edit the menu</span>Change anything staff study: drinks, dishes, wines, guide and allergen cards, hints, and the menu dates. Edits stay a draft on this device until you tap <b>Publish</b>. Then every phone gets them the next time the app opens.</div>
+      <div class="clive" id="cLive"></div>
+      <div class="chipbar csets" id="cSets" aria-label="What to edit"></div>
+      <div id="cListWrap">
+        <div class="tools">
+          <div class="field grow"><svg class="i lead" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><label class="vh" for="cSearch">Search</label><input id="cSearch" placeholder="Search" autocomplete="off"><button class="clear" id="cClear" type="button" aria-label="Clear search" hidden><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+          <div class="field"><svg class="i lead" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"/></svg><label class="vh" for="cCat">Section</label><select id="cCat"></select><svg class="i chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></div>
+        </div>
+        <div class="bar-row"><span class="mini" id="cCount"></span><button class="btn gold sm" id="cAdd" type="button">Add</button></div>
+        <div id="cList"></div>
+      </div>
+      <div id="cEdit" class="hidden"></div>
+      <div id="cSettings" class="hidden"></div>
+      <div class="q cmore" id="cMore">
+        <h2 class="h-sec">Versions &amp; backup</h2>
+        <div class="acts"><button class="btn sm" id="cHistBtn" type="button"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>Earlier versions</span></button><button class="btn sm" id="cExport" type="button"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v12M6 11l6 6 6-6M4 20h16"/></svg><span>Download backup</span></button><button class="btn sm" id="cImport" type="button"><svg class="i" viewBox="0 0 24 24"><path d="M12 20V8M6 13l6-6 6 6M4 4h16"/></svg><span>Load a backup</span></button></div>
+        <div id="cHist" class="hidden"></div>
+        <input type="file" id="cFile" accept="application/json,.json" hidden>
+      </div>
+      <div class="pubbar hidden" id="cPub" role="region" aria-label="Unpublished changes">
+        <div id="cPubMain" class="pubmain"><div class="pubn" id="cPubN"></div><button class="btn sm" id="cDiscard" type="button"><span>Discard</span></button><button class="btn rose sm" id="cPubBtn" type="button"><svg class="i" viewBox="0 0 24 24"><path d="M4 12l16-8-6 16-3-7z"/></svg><span>Publish</span></button></div>
+        <div id="cPubForm" class="pubform qe hidden">
+          <div class="qerow" style="grid-template-columns:1fr 1.6fr"><div><label class="lbl" for="cpBy">Your name</label><input class="ff" id="cpBy" maxlength="40" autocomplete="name"></div><div><label class="lbl" for="cpNote">What changed <span class="opt">optional</span></label><input class="ff" id="cpNote" maxlength="300" placeholder="e.g. Fall cocktails, new paella"></div></div>
+          <div class="cwarn" id="cpErr" role="alert"></div>
+          <div class="nav"><button class="btn sm" id="cpCancel" type="button">Not yet</button><button class="btn rose sm" id="cpGo" type="button"><svg class="i" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><span>Publish to staff</span></button></div>
+        </div>
+      </div>
+    </section>
+
     <section id="team" aria-label="Team progress">
       <div class="kpi">
         <div class="q"><div class="eyebrow">Staff</div><div class="big" id="kN">0</div><div class="mini" id="kNs">&nbsp;</div></div>
@@ -341,13 +419,15 @@ details.grp .glist{border-top:1px solid var(--line);padding:0 14px;}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
 <script src="/js/illus.js"></script>
+<script src="/js/illus2.js"></script>
 <script src="/js/drinks.js"></script>
 <script src="/js/food.js"></script>
 <script src="/js/guide.js"></script>
+<script src="/js/diet.js"></script>
 <script src="/js/allergy.js"></script>
 <script src="/js/sections.js"></script>
 <script src="/js/photos-seed.js"></script>
 <script src="/js/photos.js"></script>
-<script src="/js/manager.js"></script>
-<script src="/js/manager-quizzes.js"></script>
+<script src="/js/coach.js"></script>
+<script src="/js/content.js" data-then="/js/manager.js,/js/manager-quizzes.js,/js/manager-content.js"></script>
 </body></html>

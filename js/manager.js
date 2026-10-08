@@ -124,9 +124,9 @@ const FCATS=[...new Set(FOOD.map(f=>f.cat))], DCATS=[...new Set(DRINKS.map(d=>d.
 let pTarget=null, pOpen={}, pLast=null;
 $("pBy").value=localStorage.getItem("av_photo_by")||"";
 $("pBy").oninput=()=>localStorage.setItem("av_photo_by",$("pBy").value.trim());
-function setMode(m){ [["mTeam","team"],["mQuiz","quizzes"],["mPhotos","photos"]].forEach(([b,id])=>{ $(b).classList.toggle("on",m===id); $(b).setAttribute("aria-pressed",m===id); $(id).classList.toggle("hidden",m!==id); });
-  if(m==="photos") loadPhotos(); if(m==="quizzes"){ qzLoad().then(renderQuizzes); } }
-$("mTeam").onclick=()=>setMode("team"); $("mQuiz").onclick=()=>setMode("quizzes"); $("mPhotos").onclick=()=>setMode("photos");
+function setMode(m){ [["mTeam","team"],["mQuiz","quizzes"],["mPhotos","photos"],["mMenu","content"]].forEach(([b,id])=>{ $(b).classList.toggle("on",m===id); $(b).setAttribute("aria-pressed",m===id); $(id).classList.toggle("hidden",m!==id); });
+  if(m==="photos") loadPhotos(); if(m==="quizzes"){ qzLoad().then(renderQuizzes); } if(m==="content") renderContent(); else if(typeof renderPubBar==="function"&&typeof CT!=="undefined"&&CT.loaded) renderPubBar(); }
+$("mTeam").onclick=()=>setMode("team"); $("mQuiz").onclick=()=>setMode("quizzes"); $("mPhotos").onclick=()=>setMode("photos"); $("mMenu").onclick=()=>setMode("content");
 async function loadPhotos(){ say("Loading photos…",true); await loadPhotoIndex(); say(""); renderPhotos(); }
 function photoRows(){ return PITEMS.map(it=>{ const p=photoOf(it.kind,it.name,true); return {it,p,st:p?p.status:"none"}; }); }
 function countPhotos(){ let nF=0,nD=0,nP=0; photoRows().forEach(({it,st})=>{ if(st==="ok"){ if(it.kind==="f")nF++; else nD++; } if(st==="pending") nP++; });

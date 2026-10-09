@@ -739,7 +739,7 @@ function setMode(m){
 curMode=m; if(m==="Flash"||m==="Learn") studyMode=m;
 ["Flash","Learn","Prog","Key"].forEach(k=>$("m"+k).classList.toggle("on",k===m));
 ["flash","learn","quiz","prog","key"].forEach(id=>$(id).classList.toggle("hidden",id!==({Flash:"flash",Learn:"learn",Quiz:"quiz",Prog:"prog",Key:"key"})[m]));
-$("pickBtn").hidden=(m==="Key"||m==="Prog"||m==="Quiz");
+$("pickBtn").hidden=(m==="Key"||m==="Prog"||m==="Quiz"); if($("searchBtn")) $("searchBtn").hidden=m==="Quiz";
 $("quizCall").hidden=m==="Quiz"||!QUIZZES.length;
 if(m==="Prog") renderProgress();
 if(m==="Learn") learnOpen(false);

@@ -83,3 +83,9 @@ Goal: any manager can keep the trainer current without touching code, and the re
 How it works: the data files (`js/drinks.js`, `food.js`, `guide.js`, `allergy.js`, `diet.js`, `coach.js`) are still the built-in menu. `js/content.js` fetches published edits and swaps them into those same arrays before the app starts (`index.html` / `manager.html` load the app scripts through it via `data-then`). Only sections that differ from the built-in files are published, so a section nobody edited keeps following the code. **Once a section is published from the board, the board is the source of truth for it**: code edits to that section's file won't show until someone opens "Original built-in menu" in Versions and republishes it.
 
 Handing it over: a new owner needs the manager PIN (Vercel env `MANAGER_PIN`) and nothing else to run the menu day to day. To move hosting, they need the GitHub repo, a Vercel project with a Blob store (`BLOB_READ_WRITE_TOKEN`) and `MANAGER_PIN`; load a downloaded backup in Manager → Menu → Load a backup and publish.
+
+## v5.2 (Oct 2026) — staff search
+
+- **Search** button (magnifier) next to the section picker; on Progress and Key it becomes a full-width "Search the menu" bar. Desktop: press `/`.
+- Finds any drink, dish, wine or guide / allergen card by name **or by what's in it**: ingredient, allergen, glass, garnish, grape, region, mods. Accent-insensitive ("pasion" finds Pasión), every word must match, names rank above mentions, menu items above guide cards. Shows where it matched ("Spec: …Campari…") and the price.
+- Tap a result (or Enter for the top one) to open that card in Cards, inside its section, already flipped to the details. Searches the live menu, so manager edits show up right away. Code: `js/search.js`.

@@ -84,6 +84,10 @@ How it works: the data files (`js/drinks.js`, `food.js`, `guide.js`, `allergy.js
 
 Handing it over: a new owner needs the manager PIN (Vercel env `MANAGER_PIN`) and nothing else to run the menu day to day. To move hosting, they need the GitHub repo, a Vercel project with a Blob store (`BLOB_READ_WRITE_TOKEN`) and `MANAGER_PIN`; load a downloaded backup in Manager → Menu → Load a backup and publish.
 
+## v5.2.2 (Oct 15 2026) — sparkling water
+
+- Sparkling water is **Vichy Catalan 1 L** ($12; replaces Sant Aniol sparkling). Still water stays Sant Aniol ($7). Updated in the Guide facts (`js/guide.js`: wine glass, "Our water?", NA options) and the Key tab glassware list (`js/app.js`).
+
 ## v5.2.1 (Oct 15 2026) — house pours
 
 - House vodka is **Luksusowa** (Polish potato vodka, $9 / 1.5 oz; replaces Tito's) and house rum is **Planteray 3 Stars** (not Flor de Caña). Updated in the Guide facts (`js/guide.js`) and the Key tab pours list (`js/app.js`).

@@ -686,7 +686,7 @@ $("qRetry").onclick=()=>{ const redo=[...round.missed,...round.skipped]; if(redo
 $("qNew").onclick=renderQuizList;
 $("qBack").onclick=()=>{ if($("qList").classList.contains("hidden")) renderQuizList(); else setMode(studyMode); };
 // ---------- key (quick reference) ----------
-const GLASS=[["Coupe","Most up crafted cocktails"],["Nick & Nora","Spirit-forward cocktails"],["Rocks","On the rocks / king cube"],["Collins","Still Sant Aniol, beer, cider, highballs & long cocktails"],["Goblet","Gin tonics & sangria BTG"],["Tulip","NA beers & tulip NA builds"],["Neat glass","Shots"],["Wine (bar)","Sparkling Sant Aniol & spritz"],["Flute","Sparkling wine BTG & bottle"],["White wine glass","Sangria pitcher service"],["AP glass","All BTG still wine"]];
+const GLASS=[["Coupe","Most up crafted cocktails"],["Nick & Nora","Spirit-forward cocktails"],["Rocks","On the rocks / king cube"],["Collins","Still Sant Aniol, beer, cider, highballs & long cocktails"],["Goblet","Gin tonics & sangria BTG"],["Tulip","NA beers & tulip NA builds"],["Neat glass","Shots"],["Wine (bar)","Vichy Catalan sparkling & spritz"],["Flute","Sparkling wine BTG & bottle"],["White wine glass","Sangria pitcher service"],["AP glass","All BTG still wine"]];
 const POURS=[["Vodka","Luksusowa"],["Gin","Citadelle"],["Rum","Planteray 3 Stars"],["Tequila","Exotico Blanco"],["Mezcal","Banhez"],["Bourbon","Maker's Mark"],["Rye","Rittenhouse"]];
 function buildKey(){
 $("keyColors").innerHTML=DRINKS.filter(d=>d.colors.length).map(d=>`<div class="krow"><span class="chips" style="margin:0">${d.colors.map(cl=>`<span class="chip" style="background:${TAPE[cl]}"></span>`).join("")}</span><span class="kname">${esc(d.name)}</span><span class="kval">${esc(d.bottle||d.colors.join(" + "))}</span></div>`).join("")

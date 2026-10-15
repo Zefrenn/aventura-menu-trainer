@@ -24,7 +24,7 @@ const FACTS=[
 {cat:"Service & Glassware",q:"The tulip glass is used for?",a:"N/A beers",x:"Plus tulip NA builds like El Parque & Dama Rosa"},
 {cat:"Service & Glassware",q:"The goblet is used for?",a:"Gin tonics & sangria by the glass",x:""},
 {cat:"Service & Glassware",q:"The Collins glass holds?",a:"Still Sant Aniol water, beer, cider, highballs & long cocktails",x:"El Arbol, El Intercambio, La Abeja Sonriente"},
-{cat:"Service & Glassware",q:"The wine glass (bar side) is for?",a:"Sparkling Sant Aniol water & spritzes",x:""},
+{cat:"Service & Glassware",q:"The wine glass (bar side) is for?",a:"Vichy Catalan sparkling water (1 L) & spritzes",x:"Vichy Catalan replaced Sant Aniol sparkling Oct 2026 · still water stays Sant Aniol"},
 {cat:"Service & Glassware",q:"The white wine glass is used for?",a:"Sangria pitcher service",x:""},
 {cat:"Service & Glassware",q:"The 'AP' glass is used for?",a:"All by-the-glass still wine",x:"AP = all purpose"},
 // Menu Basics (printed on the menus)
@@ -96,12 +96,12 @@ const FACTS=[
 {cat:"Beer & Cider",q:"The cider?",a:"Isastegi Sidra — $8 can · $26 for the 750 mL",x:"Basque sagardo naturala · unfiltered, dry, funky, high-acid · 'a wine lover's cider'"},
 {cat:"Beer & Cider",q:"The non-alcoholic cider?",a:"Trabanco Sidra Natural Sin Alcohol — $26 (700 mL bottle)",x:"Asturias, Spain — bottle only, great for a table that isn't drinking"},
 // NA Program
-{cat:"NA Program",q:"Our water?",a:"Sant Aniol — natural mineral water of volcanic origin",x:"Filtered through volcanic rock in La Garrotxa, Catalonia"},
+{cat:"NA Program",q:"Our water?",a:"Still: Sant Aniol ($7) · Sparkling: Vichy Catalan 1 L ($12)",x:"Sant Aniol — volcanic mineral water from La Garrotxa, Catalonia. Vichy Catalan — naturally carbonated mineral water from Caldes de Malavella, Catalonia (replaced Sant Aniol sparkling Oct 2026)"},
 {cat:"NA Program",q:"Our soda?",a:"Motor City Soda — Leonard's Syrups, Detroit",x:"Cola, Diet, Twin-Up, Golden Ginger Ale, Lemonade, Quinine Tonic"},
 {cat:"NA Program",q:"Our tea?",a:"Arbor Teas — organic, from Ann Arbor · $7",x:"Dandelion root, crimson berry, vanilla almond rooibos, chamomile, Moroccan mint, decaf earl grey, butterfly pea lemongrass, masala chai"},
 {cat:"NA Program",q:"Our coffee?",a:"RoosRoast — Ann Arbor · Lobster Butter Love drip $4",x:"Americano $6 · Espresso $4 single / $7 double (Roos machine espresso)"},
 {cat:"NA Program",q:"Butterfly pea flower party trick?",a:"Changes from blue to purple with a squeeze of citrus (pH)",x:""},
-{cat:"NA Program",q:"NA options that aren't mocktails?",a:"Good Time NA Pils & IPA, Trabanco NA cider, Arbor Teas, RoosRoast coffee, Sant Aniol",x:"Plus El Parque, Sueños de Suerte & Dama Rosa"},
+{cat:"NA Program",q:"NA options that aren't mocktails?",a:"Good Time NA Pils & IPA, Trabanco NA cider, Arbor Teas, RoosRoast coffee, Sant Aniol still & Vichy Catalan sparkling",x:"Plus El Parque, Sueños de Suerte & Dama Rosa"},
 ];
 // Wines by the glass — Dinner menu 9.11.26. kind: sparkling | rose | white | red | dessert
 const WINES=[

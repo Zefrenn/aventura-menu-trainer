@@ -1,9 +1,9 @@
 // Resource guide facts + wines by the glass. Menus: Dinner 9.11.26 · Sweet Tapas 6.24.26 · Happy Hour 8.1.26
 const FACTS=[
 // House Pours
-{cat:"House Pours",q:"House vodka?",a:"Tito's",x:"Austin, Texas — distilled from corn"},
+{cat:"House Pours",q:"House vodka?",a:"Luksusowa",x:"Poland — potato vodka, 80 proof · replaced Tito's Oct 2026 · $9 / 1.5 oz"},
 {cat:"House Pours",q:"House gin?",a:"Citadelle",x:"Maison Ferrand, Cognac, France — 19 botanicals"},
-{cat:"House Pours",q:"House rum?",a:"Flor de Caña",x:"Blended white rum from Nicaragua"},
+{cat:"House Pours",q:"House rum?",a:"Planteray 3 Stars",x:"White rum blended from Barbados, Jamaica & Trinidad (Maison Ferrand, same house as Citadelle)"},
 {cat:"House Pours",q:"House tequila?",a:"Exotico Blanco",x:"Unaged Blue Weber agave, Mexico"},
 {cat:"House Pours",q:"House mezcal?",a:"Banhez",x:"San Miguel Ejutla — smoky, unaged Espadín"},
 {cat:"House Pours",q:"House bourbon?",a:"Maker's Mark",x:"Kentucky — corn, wheat & malted barley"},

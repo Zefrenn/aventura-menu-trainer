@@ -84,6 +84,12 @@ How it works: the data files (`js/drinks.js`, `food.js`, `guide.js`, `allergy.js
 
 Handing it over: a new owner needs the manager PIN (Vercel env `MANAGER_PIN`) and nothing else to run the menu day to day. To move hosting, they need the GitHub repo, a Vercel project with a Blob store (`BLOB_READ_WRITE_TOKEN`) and `MANAGER_PIN`; load a downloaded backup in Manager → Menu → Load a backup and publish.
 
+## v5.2.3 (Oct 24 2026) — Fall builds reconciled to the Oct 23 Bar Bible
+
+- `js/drinks.js`: El Intercambio is **plain garnacha (brown squeeze bottle) + .75 oz vanilla syrup + cola** (no vanilla garnacha). El Parque is **1.5 oz blackberry & green grape shrub · .5 oz lemon · top Sprite, grapes** (acid-adjusted pineapple retired). Also: Mare Nostrum double strain, La Huerta sugar rim, Pasión Ciega on ice (no king cube), El Árbol ginger syrup + grated cinnamon, Sinfonía Agridulce house tomato gin in a Collins over ice, Sangre y Semilla sage leaf + blood orange, sangrias pour 5 oz from the 19 L keg with ½ wheel garnishes, Soleado with Giffard framboise + hibiscus crimson tea.
+- House vodka is **Tito's** again; Luksusowa is the prep vodka (`js/guide.js`, `js/app.js`).
+- Note: if the Drinks or Guide section was published from the manager board, open Versions → "Original built-in menu" and republish for these to show.
+
 ## v5.2.2 (Oct 15 2026) — sparkling water
 
 - Sparkling water is **Vichy Catalan 1 L** ($12; replaces Sant Aniol sparkling). Still water stays Sant Aniol ($7). Updated in the Guide facts (`js/guide.js`: wine glass, "Our water?", NA options) and the Key tab glassware list (`js/app.js`).

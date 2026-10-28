@@ -3,7 +3,7 @@
 // "X*" = only with the listed mod, OR not printed on the menu — say the mod / ask Chef before you promise it.
 const DIET={
 "Encurtidos":["VG","V","GF","DF"],"Quesos":["V","GF*"],"Sardinas":["P","DF","GF*"],"Anchoas con Piperrada":["P","DF"],
-"Escalivada":["V","VG*","DF*","GF*"],"Ajo Blanco":["DF","GF","V*","VG*"],"Quesos y Charcutería":["GF*"],"Pan a la Catalana":["VG","V","DF"],"Almendras y Piña":["V"],
+"Escalivada":["VG","V","DF","GF*"],"Ajo Blanco":["DF","GF","V*","VG*"],"Quesos y Charcutería":["GF*"],"Pan a la Catalana":["VG","V","DF"],"Almendras y Piña":["V"],
 "Crudo de Atún":["P","GF","DF"],"Tortilla Española":["V","GF*","DF*"],"Patatas Bravas":["V","DF","GF*"],"Dátiles con Chorizo":["GF","DF"],
 "Pimientos de Padrón":["VG","V","DF","GF*"],"Berenjena Frita":["V","DF*","GF*"],"Setas":["V"],"Croquetas de Setas y Trufa":["V"],"Croquetas de Jamón":[],
 "Croquetas de Manchego":["V"],"Gambas":["P","DF*","GF*"],"Pulpo a la Gallega":["P","GF","DF*"],"Pepa en Adobo":["P","DF*","GF*"],"Pluma Katsu":["DF"],
@@ -16,7 +16,7 @@ const DIETNAME={V:"Vegetarian",VG:"Vegan",P:"Pescatarian",GF:"Gluten-free",DF:"D
 const DIETNOTE={
 "Quesos":"GF: no baguette",
 "Sardinas":"GF: chips share the fryer — sub baguette is NOT GF; ask Chef",
-"Escalivada":"printed V only — ask Chef about vegan / DF / GF (baguette on the side)",
+"Escalivada":"GF: baguette on the side",
 "Ajo Blanco":"V / VG: no jamón",
 "Quesos y Charcutería":"GF: no baguette / crackers",
 "Tortilla Española":"GF / DF not printed — alioli is egg-based, no dairy in the tortilla; confirm with Chef",

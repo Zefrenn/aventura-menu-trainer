@@ -84,6 +84,14 @@ How it works: the data files (`js/drinks.js`, `food.js`, `guide.js`, `allergy.js
 
 Handing it over: a new owner needs the manager PIN (Vercel env `MANAGER_PIN`) and nothing else to run the menu day to day. To move hosting, they need the GitHub repo, a Vercel project with a Blob store (`BLOB_READ_WRITE_TOKEN`) and `MANAGER_PIN`; load a downloaded backup in Manager → Menu → Load a backup and publish.
 
+## v5.3.0 (Oct 28 2026) — Dinner 10.17.26 · Happy Hour 10.11.26 · Oct 26 build sheet
+
+- Menu stamps everywhere (`index.html`, `js/content.js`, `js/guide.js`, `js/food.js`, manager help text): Dinner 10·17·26 · Sweet tapas 6·24·26 · Happy hour 10·11·26. Happy hour items and prices are unchanged from 8.1.26.
+- `js/food.js`: Pan a la Catalana is on **sourdough** (was ciabatta); Señorito is **swordfish** (was whitefish); Escalivada is printed **VG** (`js/diet.js`, `js/allergy.js` updated — GF only with the baguette on the side); "9/11 menu" tips reworded.
+- `js/drinks.js` reconciled to the **Oct 26 Service Well Build Sheet** on top of the Bar Bible: El Árbol takes OJ + **lemon**; Dama Rosa garnish is **cucumber + loose mint**; El Parque garnish is a grape and its printed line is "seasonal fruit shrub, citrus"; Sangre y Semilla and Orden del Médico in the goblet on full ice; Carajillo gets Maldon by name. New **PURPLE / PINK** tape colors: the three Sin Alcohol builds carry their NA-shelf tag (Dama Rosa purple · El Parque green · Sueños pink) and the sangrias carry RED / WHITE for the 19 L kegs; the Key tab footnote explains it. Every cocktail now has a one-line taste/sell line from the Bar Bible.
+- `js/guide.js`: NA beers are Ted Segers NA Pils ($7, Michigan) and Good Time NA IPA ($8); goblet fact names the drinks; Cariñena 'El Microscopi' replaced by **Alemany i Corrió 'Pas Curtei'** (Barcelona 2023, $21 / 84).
+- `js/coach.js` hints follow: sugar rim, sage + blood orange, blackberry-grape shrub + Sprite, swordfish, no juniper on the Dama Rosa, Pas Curtei.
+
 ## v5.2.3 (Oct 24 2026) — Fall builds reconciled to the Oct 23 Bar Bible
 
 - `js/drinks.js`: El Intercambio is **plain garnacha (brown squeeze bottle) + .75 oz vanilla syrup + cola** (no vanilla garnacha). El Parque is **1.5 oz blackberry & green grape shrub · .5 oz lemon · top Sprite, grapes** (acid-adjusted pineapple retired). Also: Mare Nostrum double strain, La Huerta sugar rim, Pasión Ciega on ice (no king cube), El Árbol ginger syrup + grated cinnamon, Sinfonía Agridulce house tomato gin in a Collins over ice, Sangre y Semilla sage leaf + blood orange, sangrias pour 5 oz from the 19 L keg with ½ wheel garnishes, Soleado with Giffard framboise + hibiscus crimson tea.

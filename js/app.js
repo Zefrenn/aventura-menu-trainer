@@ -690,7 +690,7 @@ const GLASS=[["Coupe","Most up crafted cocktails"],["Nick & Nora","Spirit-forwar
 const POURS=[["Vodka","Tito's"],["Gin","Citadelle"],["Rum","Planteray 3 Stars"],["Tequila","Exotico Blanco"],["Mezcal","Banhez"],["Bourbon","Maker's Mark"],["Rye","Rittenhouse"]];
 function buildKey(){
 $("keyColors").innerHTML=DRINKS.filter(d=>d.colors.length).map(d=>`<div class="krow"><span class="chips" style="margin:0">${d.colors.map(cl=>`<span class="chip" style="background:${TAPE[cl]}"></span>`).join("")}</span><span class="kname">${esc(d.name)}</span><span class="kval">${esc(d.bottle||d.colors.join(" + "))}</span></div>`).join("")
-+`<div class="krow"><span class="kname mute" style="font-size:14px;font-style:italic">Sangrias & NA builds — no batch color, built à la minute</span></div>`;
++`<div class="krow"><span class="kname mute" style="font-size:14px;font-style:italic">Sin Alcohol builds are tagged on the NA shelf (Dama Rosa purple · El Parque green · Sueños pink); sangrias pour from the red / white 19 L kegs — no batch bottles</span></div>`;
 const hh=FOOD.filter(f=>f.hh).sort((a,b)=>parseFloat(a.hh)-parseFloat(b.hh));
 $("keyHH").innerHTML=hh.map(f=>`<div class="krow"><span class="kname">${esc(f.name)}</span><span class="kval">$${esc(f.hh)}${/piece/.test(f.price)||parseFloat(f.hh)<=3?" / piece":""}${f.cat!=="Happy Hour"?" · dinner "+esc(f.price):""}</span></div>`).join("");
 $("keyGlass").innerHTML=GLASS.map(g=>`<div class="krow"><span class="gicon">${GICON[g[0]]||""}</span><span class="kname">${g[0]}</span><span class="kval">${g[1]}</span></div>`).join("");

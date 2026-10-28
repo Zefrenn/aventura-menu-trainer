@@ -320,7 +320,7 @@ function renderSettings() {
   $("cSettings").innerHTML = `<div class="q qe">
     <h2 class="h-sec">Menu dates</h2>
     <label class="lbl" for="cs_menus">Line under the logo in the trainer</label><input class="ff" id="cs_menus" value="${esc(s.menus)}" maxlength="200">
-    <div class="fhelp">Update it when a new menu prints, e.g. “Dinner 10·15·26 · Sweet tapas 6·24·26 · Happy hour 8·1·26”.</div>
+    <div class="fhelp">Update it when a new menu prints, e.g. “Dinner 10·17·26 · Sweet tapas 6·24·26 · Happy hour 10·11·26”.</div>
   </div>
   <div class="q qe">
     <h2 class="h-sec">Batch tape colors</h2>

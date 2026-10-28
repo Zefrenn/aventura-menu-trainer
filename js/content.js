@@ -9,7 +9,7 @@
 const AVContent = (function () {
   const CACHE = "av_content_cache";
   const clone = o => JSON.parse(JSON.stringify(o));
-  const MENUS = "Dinner 9·11·26 · Sweet tapas 6·24·26 · Happy hour 8·1·26";
+  const MENUS = "Dinner 10·17·26 · Sweet tapas 6·24·26 · Happy hour 10·11·26";
   const strip = r => { const o = {}; Object.keys(r).forEach(k => { if (k[0] !== "_") o[k] = r[k]; }); return o; };
   const fill = (arr, list) => { arr.splice(0, arr.length, ...list); return arr; };
   const reset = (obj, src) => { Object.keys(obj).forEach(k => delete obj[k]); Object.assign(obj, src); return obj; };

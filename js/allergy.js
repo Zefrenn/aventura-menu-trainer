@@ -1,5 +1,5 @@
 const ALLERGY_FACTS=[
-{cat:"Allergens & Mods",q:"Fully vegan dishes as printed (VG)?",a:"Encurtidos, Pan a la Catalana, Pimientos de Padrón, Primavera paella",x:"Ajo Blanco is vegan without the jamón. Escalivada is printed V only — ask Chef"},
+{cat:"Allergens & Mods",q:"Fully vegan dishes as printed (VG)?",a:"Encurtidos, Escalivada, Pan a la Catalana, Pimientos de Padrón, Primavera paella",x:"Ajo Blanco is vegan without the jamón. Escalivada went from V to VG on the 10.17 menu"},
 {cat:"Allergens & Mods",q:"Vegetarian traps on the menu?",a:"Flor de Alcachofa (anchovy aioli), Goxua (pork gelatin), Quesos y Charcutería (meat), Setas is V but not GF (shoyu)",x:"Flor de Alcachofa is vegetarian if you sub garlic aioli"},
 {cat:"Allergens & Mods",q:"Gluten-free paellas?",a:"Señorito, Valenciana, Rabo de Toro, Americana, Primavera — NOT the Marinera Fideuà",x:"Fideo = wheat noodle"},
 {cat:"Allergens & Mods",q:"Dairy-free tapas as printed (DF)?",a:"Crudo de Atún, Patatas Bravas, Dátiles, Pluma Katsu, Flor de Alcachofa, Pintxos Morunos — plus Padrón (vegan)",x:"Aioli is egg + oil, not dairy. Pulpo needs no-potatoes; Berenjena needs no-blue-cheese"},

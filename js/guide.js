@@ -1,4 +1,4 @@
-// Resource guide facts + wines by the glass. Menus: Dinner 9.11.26 · Sweet Tapas 6.24.26 · Happy Hour 8.1.26
+// Resource guide facts + wines by the glass. Menus: Dinner 10.17.26 · Sweet Tapas 6.24.26 · Happy Hour 10.11.26
 const FACTS=[
 // House Pours
 {cat:"House Pours",q:"House vodka?",a:"Tito's",x:"Texas, corn vodka · Luksusowa (Polish potato vodka, $9 / 1.5 oz) is the prep vodka for infusions and batches, and pours by request"},
@@ -22,7 +22,7 @@ const FACTS=[
 {cat:"Service & Glassware",q:"The champagne flute is used for?",a:"Sparkling wine by the glass & bottle",x:"Both cavas"},
 {cat:"Service & Glassware",q:"The Nick & Nora is used for?",a:"Spirit-forward cocktails",x:"Mare Nostrum"},
 {cat:"Service & Glassware",q:"The tulip glass is used for?",a:"N/A beers",x:"Plus tulip NA builds like El Parque & Dama Rosa"},
-{cat:"Service & Glassware",q:"The goblet is used for?",a:"Gin tonics & sangria by the glass",x:""},
+{cat:"Service & Glassware",q:"The goblet is used for?",a:"Gin tonics & sangria by the glass",x:"Sangre y Semilla, Orden del Médico, Tinta & Soleado · Sinfonía is the one gin-tonic in a Collins now"},
 {cat:"Service & Glassware",q:"The Collins glass holds?",a:"Still Sant Aniol water, beer, cider, highballs & long cocktails",x:"El Arbol, El Intercambio, La Abeja Sonriente"},
 {cat:"Service & Glassware",q:"The wine glass (bar side) is for?",a:"Vichy Catalan sparkling water (1 L) & spritzes",x:"Vichy Catalan replaced Sant Aniol sparkling Oct 2026 · still water stays Sant Aniol"},
 {cat:"Service & Glassware",q:"The white wine glass is used for?",a:"Sangria pitcher service",x:""},
@@ -34,7 +34,7 @@ const FACTS=[
 {cat:"Menu Basics",q:"The surcharge on every bill?",a:"3% — printed on the menu to offset rising operational costs",x:"Guests can read more at thepulpogroup.com/surcharge"},
 {cat:"Menu Basics",q:"Menu diet codes?",a:"GF gluten-free · V vegetarian · VG vegan · DF dairy-free",x:"V = vegetarian and VG = vegan on our printed menu — don't mix them up"},
 {cat:"Menu Basics",q:"How big is a dessert-wine pour?",a:"2.5 oz — every glass on the Vino de Postre list",x:"Sherries, Madeiras and the Moscatel"},
-{cat:"Menu Basics",q:"Three menus in service right now?",a:"Dinner (9.11.26), Sweet Tapas (6.24.26) & Happy Hour (8.1.26)",x:"Sweet Tapas = postres, vino de postre & café"},
+{cat:"Menu Basics",q:"Three menus in service right now?",a:"Dinner (10.17.26), Sweet Tapas (6.24.26) & Happy Hour (10.11.26)",x:"Sweet Tapas = postres, vino de postre & café"},
 // Happy Hour
 {cat:"Happy Hour",q:"Happy hour hours?",a:"3–6pm daily & every night 9pm–close",x:""},
 {cat:"Happy Hour",q:"Happy hour drink deal?",a:"25% off ALL drinks",x:"Cocktails, wine, beer, cider, NA — everything"},
@@ -92,7 +92,7 @@ const FACTS=[
 {cat:"Beer & Cider",q:"Our exclusive house beer?",a:"Mothfire 'Octo' lightly hopped ale — $10",x:"Ann Arbor · brewed exclusively for The Pulpo Group — poured at all 3 restaurants · crisp, lightly citrusy, not bitter"},
 {cat:"Beer & Cider",q:"The hazy IPA?",a:"Mothfire 'Lolo' — $10",x:"Ann Arbor · tropical, juicy, soft bitterness"},
 {cat:"Beer & Cider",q:"The Spanish lager?",a:"Estrella Galicia 'Cerveza Especial' — $8",x:"Pale lager · A Coruña, Galicia · crisp & classic"},
-{cat:"Beer & Cider",q:"Our NA beers?",a:"Good Time Brewing NA Pils & NA IPA — $8 each",x:"<0.5% abv · New York · serve in the tulip"},
+{cat:"Beer & Cider",q:"Our NA beers?",a:"Ted Segers NA Pils ($7) & Good Time Brewing NA IPA ($8)",x:"<0.5% abv · Ted Segers is from Michigan, Good Time from New York · serve in the tulip"},
 {cat:"Beer & Cider",q:"The cider?",a:"Isastegi Sidra — $8 can · $26 for the 750 mL",x:"Basque sagardo naturala · unfiltered, dry, funky, high-acid · 'a wine lover's cider'"},
 {cat:"Beer & Cider",q:"The non-alcoholic cider?",a:"Trabanco Sidra Natural Sin Alcohol — $26 (700 mL bottle)",x:"Asturias, Spain — bottle only, great for a table that isn't drinking"},
 // NA Program
@@ -101,9 +101,9 @@ const FACTS=[
 {cat:"NA Program",q:"Our tea?",a:"Arbor Teas — organic, from Ann Arbor · $7",x:"Dandelion root, crimson berry, vanilla almond rooibos, chamomile, Moroccan mint, decaf earl grey, butterfly pea lemongrass, masala chai"},
 {cat:"NA Program",q:"Our coffee?",a:"RoosRoast — Ann Arbor · Lobster Butter Love drip $4",x:"Americano $6 · Espresso $4 single / $7 double (Roos machine espresso)"},
 {cat:"NA Program",q:"Butterfly pea flower party trick?",a:"Changes from blue to purple with a squeeze of citrus (pH)",x:""},
-{cat:"NA Program",q:"NA options that aren't mocktails?",a:"Good Time NA Pils & IPA, Trabanco NA cider, Arbor Teas, RoosRoast coffee, Sant Aniol still & Vichy Catalan sparkling",x:"Plus El Parque, Sueños de Suerte & Dama Rosa"},
+{cat:"NA Program",q:"NA options that aren't mocktails?",a:"Ted Segers NA Pils, Good Time NA IPA, Trabanco NA cider, Arbor Teas, RoosRoast coffee, Sant Aniol still & Vichy Catalan sparkling",x:"Plus El Parque, Sueños de Suerte & Dama Rosa"},
 ];
-// Wines by the glass — Dinner menu 9.11.26. kind: sparkling | rose | white | red | dessert
+// Wines by the glass — Dinner menu 10.17.26. kind: sparkling | rose | white | red | dessert
 const WINES=[
 {cat:"Wines BTG",kind:"sparkling",name:"Cava Torremilanos Peñalba López, Brut Nature",region:"Ribera del Duero",price:"18 / 72",notes:"bright citrus, creamy texture, apple, brioche",grape:"Traditional-method cava — confirm the blend with the rep",story:"One of the rare cavas made outside Catalonia — the Peñalba López family's organic estate in Aranda de Duero · Brut Nature = zero dosage",like:"Champagne",pair:"Pan a la Catalana, encurtidos, croquetas, buñuelos"},
 {cat:"Wines BTG",kind:"rose",name:"Rosé Cava Portell, Brut",region:"Penedès",price:"14 / 56",notes:"rhubarb, wild strawberry, blood orange",grape:"Trepat (the Catalan rosé-cava grape) — confirm",story:"Cooperative-grown, traditional method; pale pink with fine bubbles",like:"Rosé Champagne / crémant rosé",pair:"Quesos y charcutería, dátiles, gambas"},
@@ -116,7 +116,7 @@ const WINES=[
 {cat:"Wines BTG",kind:"red",name:"Hondarrabi Beltza Ameztoi 'Stimatum'",region:"Getariako Txakolina 2024",price:"15 / 60",notes:"wild berries, tart cherry, lively acidity, natural spritz",grape:"100% Hondarrabi Beltza",story:"A RED txakoli from Getaria on the Basque coast — light, chillable, a touch of spritz; serve cool",like:"Chilled Gamay / Beaujolais",pair:"Anchoas, sardinas, pintxos morunos, dátiles"},
 {cat:"Wines BTG",kind:"red",name:"Mencía Merayo 'Las Tres Filas'",region:"Bierzo 2023",price:"14 / 56",notes:"fresh red berries, silky tannins, subtle minerality",grape:"100% Mencía",story:"Young, unoaked Mencía from old vines in Bierzo (northwest Spain) — 'three rows' of the family's vineyard",like:"Unoaked Pinot Noir / Cru Beaujolais",pair:"Pulpo a la gallega, setas, tortilla"},
 {cat:"Wines BTG",kind:"red",name:"Callet Blend Mesquida Mora 'Sincronía Negre'",region:"Mallorca 2024",price:"15 / 60",notes:"fresh red berries, silky tannins, subtle minerality",grape:"Callet & Manto Negro (Mallorcan natives) with a little Syrah & Cabernet — confirm",story:"Bàrbara Mesquida Mora farms biodynamically in the middle of Mallorca — the island's native grapes, made fresh",like:"Juicy Grenache / Cinsault",pair:"Dátiles con chorizo, Americana paella, berenjena frita"},
-{cat:"Wines BTG",kind:"red",name:"Cariñena Alemany i Corrió 'El Microscopi'",region:"Barcelona 2025",price:"19 / 76",notes:"juicy dark berries, mediterranean herbs & spice, elegant tannin",grape:"100% Cariñena (Carignan)",story:"Irene Alemany & Laurent Corrió, tiny biodynamic cellar in Penedès — the 'microscope' is a close-up look at one old-vine grape",like:"Old-vine Carignan / Priorat, fresher",pair:"Pintxos morunos, Rabo de Toro paella, pluma katsu"},
+{cat:"Wines BTG",kind:"red",name:"Cariñena Blend Alemany i Corrió 'Pas Curtei'",region:"Barcelona 2023",price:"21 / 84",notes:"juicy dark berries, mediterranean herbs & spice, elegant tannin",grape:"Cariñena-led blend with Merlot & Cabernet — confirm the split with the rep",story:"Irene Alemany & Laurent Corrió, tiny biodynamic cellar in Penedès — 'Pas Curtei' is the name of the old vineyard path; replaced 'El Microscopi' on the 10.17 menu",like:"Old-vine Carignan / Priorat, fresher",pair:"Pintxos morunos, Rabo de Toro paella, pluma katsu"},
 {cat:"Wines BTG",kind:"red",name:"Tempranillo Volver Tinto",region:"La Mancha 2022",price:"17 / 68",notes:"black currant, plum, subtle toast, mellow tannin",grape:"100% Tempranillo",story:"Single 1957 vineyard on sandy iron-rich soil · 14 months in used French oak · NOT Rioja — La Mancha",like:"Mellow Rioja Crianza",pair:"Bold meats — pintxos morunos, Rabo de Toro"},
 {cat:"Wines BTG",kind:"red",name:"Monastrell Bodegas Carchelo 'C'",region:"Jumilla 2019",price:"13 / 50",notes:"blackberry bramble, blueberry, violet",grape:"Monastrell (Mourvèdre) — Jumilla's signature grape",story:"Old bush vines on limestone in Jumilla, southeast Spain — the ripe, easy-drinking house red",like:"Southern Rhône / Zinfandel",pair:"Dátiles con chorizo, croquetas de jamón, Americana paella"},
 // Vino de Postre — Sweet Tapas menu · all pours 2.5 oz

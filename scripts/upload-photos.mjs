@@ -20,6 +20,7 @@ const DEFAULT_IDS = {
 };
 
 if (!PIN) { console.error("Set MANAGER_PIN in the environment (never paste it into a file)."); process.exit(1); }
+if (!/^[\x21-\x7e]+$/.test(PIN)) { console.error("MANAGER_PIN must be the real PIN (plain digits/letters) — replace the •••• placeholder."); process.exit(1); }
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(DEFAULT_IDS);
 for (const id of ids) {
   if (!/^[df]-[a-z0-9-]{1,60}$/.test(id)) { console.error(`skip ${id}: not a photo id`); continue; }

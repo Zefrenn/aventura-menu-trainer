@@ -84,6 +84,12 @@ How it works: the data files (`js/drinks.js`, `food.js`, `guide.js`, `allergy.js
 
 Handing it over: a new owner needs the manager PIN (Vercel env `MANAGER_PIN`) and nothing else to run the menu day to day. To move hosting, they need the GitHub repo, a Vercel project with a Blob store (`BLOB_READ_WRITE_TOKEN`) and `MANAGER_PIN`; load a downloaded backup in Manager → Menu → Load a backup and publish.
 
+## v5.4.0 (Oct 28 2026) — Fuego streak
+
+- Cards tab: a flame pill on the card stack counts consecutive **Got it** swipes (or the Got it button / → key). It appears at 2, turns orange and flickers from 5 (“¡Fuego!”, “¡En llamas!” at 10), pops on every hit, and milestone toasts land at 5 / 10 / 25 / 50. A **Learning** swipe ends the streak (“Streak ends at N” from 5 up); browse-mode swipes don't touch it. Honors reduced-motion.
+- Best streak is saved per person (`me.fuego.best`, merged by max across devices) and shown on Progress; “Reset my progress” clears it.
+- `js/photos.js`: Americana photo confirmed by the kitchen — now live (was pending).
+
 ## v5.3.1 (Oct 28 2026) — pro photo shoot
 
 - 47 new plate and drink photos from the Oct 2026 shoot ship as static files in `img/p-<id>.webp` (longest side 1200 px, webp q82, built with sharp from the iCloud originals). Every dinner dish, every happy-hour bite and 11 of the 15 drinks now show a real photo on their card, and picture quizzes pick them up automatically. Still drawings only: Quesos, Escalivada, Ajo Blanco, Torrijas (Blob photo stays), El Intercambio, La Abeja Sonriente, Soleado.

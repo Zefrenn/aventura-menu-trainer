@@ -212,6 +212,15 @@ details.ing p{margin:4px 0 0;font-size:15px;line-height:1.5;}
 .counter{text-align:center;color:var(--gray-3);font-family:var(--disp);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;margin-top:8px;}
 .progress-dots{height:3px;border-radius:2px;background:var(--line);margin:10px 24px 0;overflow:hidden;} .progress-dots i{display:block;height:100%;background:var(--rose);transition:width .3s var(--ease);}
 .coach{position:absolute;left:0;right:0;bottom:16px;z-index:4;display:flex;justify-content:center;pointer-events:none;}
+/* Fuego: consecutive "Got it" swipes. Hidden under 2; flickers from 5. */
+.fuego{position:absolute;top:10px;right:10px;z-index:5;display:flex;align-items:center;gap:5px;padding:5px 11px 5px 8px;border-radius:999px;background:var(--paper);border:1px solid var(--line-2);box-shadow:var(--shadow);color:var(--rose-deep);font-family:var(--disp);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;pointer-events:none;opacity:0;transform:translateY(-6px) scale(.9);transition:opacity .25s var(--ease),transform .25s var(--ease);}
+.fuego[hidden]{display:none;} .fuego.on{opacity:1;transform:none;} .fuego .fl{font-size:10px;color:var(--gray-3);letter-spacing:.2em;}
+.fuego .flame{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;transform-origin:50% 100%;} .fuego .flame .core{stroke:none;fill:var(--rose);opacity:.55;}
+.fuego.hot{color:#D9622B;border-color:#E8B59A;} .fuego.hot .flame .core{fill:#F2A23A;opacity:.9;} .fuego.hot .flame{animation:flicker 1.1s ease-in-out infinite;}
+.fuego.pop .flame{animation:fpop .42s var(--ease);} .fuego.hot.pop .flame{animation:fpop .42s var(--ease),flicker 1.1s ease-in-out infinite .42s;}
+@keyframes fpop{0%{transform:scale(1)}35%{transform:scale(1.45) rotate(-8deg)}70%{transform:scale(.95) rotate(5deg)}100%{transform:scale(1)}}
+@keyframes flicker{0%,100%{transform:scaleY(1) scaleX(1)}30%{transform:scaleY(1.08) scaleX(.95) rotate(-2deg)}60%{transform:scaleY(.94) scaleX(1.05) rotate(2deg)}}
+@media (prefers-reduced-motion: reduce){ .fuego .flame{animation:none!important;} .fuego{transition:none;} }
 .coach span{font-family:var(--disp);font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:600;color:var(--gray-2);background:var(--stamp-bg);border:1px solid var(--line);padding:7px 12px 5px;border-radius:999px;box-shadow:var(--shadow);}
 .coach span svg{width:12px;height:12px;vertical-align:-2px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
 
@@ -362,6 +371,7 @@ details.ing p{margin:4px 0 0;font-size:15px;line-height:1.5;}
 <div class="stamp yes" id="stampYes" aria-hidden="true">Got it</div>
 <div class="stamp no" id="stampNo" aria-hidden="true">Learning</div>
 </div>
+<div class="fuego" id="fuego" hidden role="status" aria-live="polite"><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22c4.4 0 7-2.9 7-6.6 0-2.7-1.4-4.4-2.7-6-.6 1.3-1.4 2-2.5 2.3.5-2.9-.5-6.1-3.3-8.7.1 3-1.3 4.4-2.7 6C6.3 10.7 5 12.6 5 15.4 5 19.1 7.6 22 12 22z"/><path class="core" d="M12 22c2.2 0 3.6-1.4 3.6-3.4 0-1.6-1-2.6-1.8-3.7-.8 1.2-1.4 1.5-2.1 1.6.2-1.6-.3-2.8-1.3-3.9-.4 1.7-2 2.8-2 5.3 0 2.5 1.4 4.1 3.6 4.1z"/></svg><span class="fn" id="fuegoN">0</span><span class="fl" id="fuegoL">Fuego</span></div>
 <div class="coach" id="coach" hidden><span><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg> Swipe <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg> · tap to flip</span></div>
 </div>
 <div class="progress-dots" aria-hidden="true"><i id="deckBar" style="width:0%"></i></div>

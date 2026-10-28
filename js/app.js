@@ -55,6 +55,7 @@ const merged=JSON.parse(JSON.stringify(remote)); merged.items=merged.items||{};
 Object.keys(me.items).forEach(k=>{ const L=me.items[k], R=merged.items[k]; if(!R||act(L)>act(R)) merged.items[k]=L; });
 const lq=me.quiz||{right:0,total:0}, rq=remote.quiz||{right:0,total:0}; merged.quiz=(lq.total>rq.total)?lq:rq;
 const ll=me.learn||{right:0,total:0}, rl=remote.learn||{right:0,total:0}; merged.learn=(ll.total>rl.total)?ll:rl;
+merged.fuego={best:Math.max((me.fuego&&me.fuego.best)||0,(remote.fuego&&remote.fuego.best)||0)};
 merged.quizzes=Object.assign({},remote.quizzes||{}); Object.entries(me.quizzes||{}).forEach(([id,x])=>{ const y=merged.quizzes[id]; if(!y||(x.tries||0)>(y.tries||0)) merged.quizzes[id]=x; });
 if(typeof AVContent!=="undefined") AVContent.migrate(merged.items); merged.name=me.name; merged.slug=me.slug; merged.started=Math.min(merged.started||Date.now(),me.started||Date.now());
 me=merged; score={right:me.quiz.right,total:me.quiz.total}; store.profiles[me.slug]=me; saveStore(store); resetDeck(); afterProfile(); }
@@ -246,6 +247,20 @@ SW.addEventListener("pointerup",e=>{ if(e.pointerType==="touch") return; endDrag
 SW.addEventListener("pointercancel",e=>{ if(e.pointerType==="touch") return; endDrag(e.pointerId,true); });
 // keep a mouse drag alive if the cursor leaves the window without capture
 window.addEventListener("mouseup",()=>{ if(drag&&typeof drag.id==="number") endDrag(drag.id,false); });
+// ---------- Fuego: consecutive "Got it" swipes ----------
+let fuego=0, fuegoT=null;
+const FUEGO_MILESTONES={5:"¡Fuego! 5 in a row",10:"¡En llamas! 10 in a row",25:"25 in a row — unstoppable",50:"50 in a row — ¡leyenda!"};
+function fuegoRender(pop){
+const el=$("fuego"); clearTimeout(fuegoT);
+if(fuego<2){ el.classList.remove("on","hot","pop"); fuegoT=setTimeout(()=>{ el.hidden=true; },260); return; }
+el.hidden=false; $("fuegoN").textContent=fuego; $("fuegoL").textContent=fuego>=10?"¡En llamas!":fuego>=5?"¡Fuego!":"Fuego";
+el.classList.toggle("hot",fuego>=5); el.classList.remove("pop");
+requestAnimationFrame(()=>{ el.classList.add("on"); if(pop) el.classList.add("pop"); });
+el.setAttribute("aria-label",`${fuego} in a row`);
+}
+function fuegoHit(){ fuego++; if(me){ me.fuego=me.fuego||{best:0}; if(fuego>(me.fuego.best||0)) me.fuego.best=fuego; } fuegoRender(true); return FUEGO_MILESTONES[fuego]||null; }
+function fuegoBreak(){ const was=fuego; fuego=0; fuegoRender(false); return was>=5?`Streak ends at ${was}`:null; }
+function fuegoReset(){ fuego=0; fuegoRender(false); }
 // dir: +1 right, -1 left. Right = got it / (browse mode) back · Left = still learning / (browse mode) next
 function commit(dir,rate){
 if(busy) return; busy=true; if(rate===undefined) rate=swipeRates;
@@ -259,7 +274,7 @@ dealIn();
 };
 setTimeout(after,300);
 }
-function applyRate(v){ if(!me)return; const r=rec(deck[idx]); r.rate=v; if(v==="got"){r.right++; r.lv=2;} else r.lv=Math.min(r.lv===undefined?0:r.lv,1); persist(); toast(v==="got"?"Got it · mastered":"Still learning"); }
+function applyRate(v){ if(!me)return; const r=rec(deck[idx]); r.rate=v; if(v==="got"){r.right++; r.lv=2;} else r.lv=Math.min(r.lv===undefined?0:r.lv,1); const special=v==="got"?fuegoHit():fuegoBreak(); persist(); toast(special||(v==="got"?"Got it · mastered":"Still learning")); }
 function dealIn(){
 render();
 SW.style.transition="none"; SW.style.transform="translateY(12px) scale(.955)"; SW.style.opacity="1"; stamps(0);
@@ -718,7 +733,7 @@ if(!me)return;
 const {out,tot,m,weak}=progressData();
 $("pName").textContent=me.name+" · Progress";
 $("pPct").textContent=Math.round(100*m/tot)+"%";
-const l=me.learn||{total:0}; $("pQuiz").textContent=l.total?`${l.total} Learn question${l.total===1?"":"s"} answered`:"Open Learn to start mastering cards";
+const l=me.learn||{total:0}, fb=(me.fuego&&me.fuego.best)||0; $("pQuiz").textContent=(l.total?`${l.total} Learn question${l.total===1?"":"s"} answered`:"Open Learn to start mastering cards")+(fb>=2?` · best Fuego streak ${fb}`:"");
 $("pSubjects").innerHTML=SUBJECTS.map(s=>{const o=out[s]; const pm=o.total?100*o.mastered/o.total:0, pl=o.total?100*o.learning/o.total:0;
 return `<div class="prow"><div class="lab"><span>${s}</span><span>${o.mastered} / ${o.total} mastered</span></div><div class="bar"><i style="width:${pm}%"></i></div><div class="bar" style="height:4px;margin-top:0"><i class="q" style="width:${pl}%"></i></div></div>`;}).join("");
 $("pWeak").innerHTML=weak.length?weak.map(x=>`<div class="weak"><span>${esc(cardTitle(x.c))}</span><span>${x.r.wrong?x.r.wrong+" missed":"learning"}</span></div>`).join(""):`<div class="subl">Nothing flagged yet.</div>`;
@@ -732,7 +747,7 @@ const txt=[`Aventura Menu Trainer — ${me.name}`,`${new Date().toLocaleDateStri
 try{await navigator.clipboard.writeText(txt);$("pCopy").textContent="Copied ✓";}catch(e){prompt("Copy this:",txt);}
 setTimeout(()=>$("pCopy").textContent="Copy report for manager",1500);
 };
-$("pReset").onclick=()=>{ if(!me||!confirm(`Reset card progress for ${me.name}? Quiz scores stay.`))return; me.items={}; me.quiz={right:0,total:0}; me.learn={right:0,total:0}; score={right:0,total:0};
+$("pReset").onclick=()=>{ if(!me||!confirm(`Reset card progress for ${me.name}? Quiz scores stay.`))return; me.items={}; me.quiz={right:0,total:0}; me.learn={right:0,total:0}; me.fuego={best:0}; fuegoReset(); score={right:0,total:0};
 try{ localStorage.removeItem(LKEY()); }catch(e){} L={filter:undefined,items:[],queue:[],done:[],start:{},roundNo:0,review:false,state:"idle"}; persist(); renderProgress(); };
 // ---------- modes ----------
 function setMode(m){
@@ -746,7 +761,7 @@ if(m==="Learn") learnOpen(false);
 if(m==="Quiz"&&!(activeQuiz&&round.queue.length)) renderQuizList();
 }
 // after picking / switching a person: refresh whatever is on screen
-function afterProfile(){ renderQuizCall(); if(curMode==="Learn") learnOpen(false); else if(curMode==="Quiz") renderQuizList(); else if(curMode==="Prog") renderProgress(); }
+function afterProfile(){ fuegoReset(); renderQuizCall(); if(curMode==="Learn") learnOpen(false); else if(curMode==="Quiz") renderQuizList(); else if(curMode==="Prog") renderProgress(); }
 $("mFlash").onclick=()=>setMode("Flash");
 $("mLearn").onclick=()=>setMode("Learn");
 $("mKey").onclick=()=>setMode("Key");

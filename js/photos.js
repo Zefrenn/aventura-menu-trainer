@@ -99,8 +99,8 @@ const PHOTO_SEED = {
     note: "House chips with draped serrano on the wood plate." },
   "f-churritos-y-chocolate": { src: "/img/p-f-churritos-y-chocolate.webp", at: "Oct 2026", by: "Zefren", status: "ok",
     note: "Mini churros with the chocolate dip (older shoot, same plate)." },
-  "f-americana": { src: "/img/p-f-americana.webp", at: "Oct 2026", by: "Zefren", status: "pending",
-    note: "Sausage, broccolini, peas, piquillo, grilled lemon. ID from the plating — kitchen to confirm before staff see it." },
+  "f-americana": { src: "/img/p-f-americana.webp", at: "Oct 2026", by: "Zefren", status: "ok",
+    note: "Sausage, broccolini, peas, piquillo, grilled lemon — confirmed by the kitchen Oct 28 2026." },
   "f-primavera":               { src: "/img/p-f-primavera.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
   "f-tarta-de-queso":          { src: "/img/p-f-tarta-de-queso.webp", at: "Sep 2026", by: "Zefren", status: "ok" },
 };

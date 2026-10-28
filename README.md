@@ -84,6 +84,14 @@ How it works: the data files (`js/drinks.js`, `food.js`, `guide.js`, `allergy.js
 
 Handing it over: a new owner needs the manager PIN (Vercel env `MANAGER_PIN`) and nothing else to run the menu day to day. To move hosting, they need the GitHub repo, a Vercel project with a Blob store (`BLOB_READ_WRITE_TOKEN`) and `MANAGER_PIN`; load a downloaded backup in Manager → Menu → Load a backup and publish.
 
+## v5.3.1 (Oct 28 2026) — pro photo shoot
+
+- 47 new plate and drink photos from the Oct 2026 shoot ship as static files in `img/p-<id>.webp` (longest side 1200 px, webp q82, built with sharp from the iCloud originals). Every dinner dish, every happy-hour bite and 11 of the 15 drinks now show a real photo on their card, and picture quizzes pick them up automatically. Still drawings only: Quesos, Escalivada, Ajo Blanco, Torrijas (Blob photo stays), El Intercambio, La Abeja Sonriente, Soleado.
+- `js/photos.js` `PHOTO_SEED` carries a note per photo where the shot differs from the current spec (Sangre y Semilla shows the old rosemary garnish, Dama Rosa shows juniper, Patatas Bravas shows the +2 egg, Pan a la Catalana shows the add-ons). Two photos ship **pending** until the kitchen/bar confirms the ID: `f-americana` and `d-el-parque` (summer garnish) — approve them from Manager → Photos.
+- `js/photos-seed.js` shrinks from 94 KB to 32 KB: only the Carajillo still ships base64; the other three drinks moved to `/img`.
+- `scripts/upload-photos.mjs`: run `MANAGER_PIN=•••• node scripts/upload-photos.mjs` once after deploy to replace the two Sep 2026 Blob uploads that outrank the seed (`f-quesos-y-charcuteria`, `f-tarta-de-santiago`). AvenChurros and Goxua need no upload — their current ids win over the aliased Blob ids.
+- iCloud `Aventura/Beverage`, `Food`, `Happy Hour`: every photo renamed to what it shows (`<Item> - n.jpg`, `Unsure - …`, `Retired - …`, `Spread - …`), 15 byte-identical `(1)` duplicates removed, `rename-log.csv` in each folder maps old → new with the item, confidence and whether the trainer uses it.
+
 ## v5.3.0 (Oct 28 2026) — Dinner 10.17.26 · Happy Hour 10.11.26 · Oct 26 build sheet
 
 - Menu stamps everywhere (`index.html`, `js/content.js`, `js/guide.js`, `js/food.js`, manager help text): Dinner 10·17·26 · Sweet tapas 6·24·26 · Happy hour 10·11·26. Happy hour items and prices are unchanged from 8.1.26.

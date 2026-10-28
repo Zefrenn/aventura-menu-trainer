@@ -49,10 +49,10 @@ header .logo.logo-d{display:none;}
 :root[data-theme="dark"] header .logo.logo-l{display:none;} :root[data-theme="dark"] header .logo.logo-d{display:block;}
 .illus,.fillus,.wglass,.gicon,.qillus{color:var(--illus-ink);}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{scroll-padding-top:var(--sat);}
+html{scroll-padding-top:var(--sat);overflow-x:hidden;overflow-x:clip;} /* a card flying off-screen must never widen the page (iOS Safari zooms out to fit it) */
 body{margin:0;background:var(--bg);color:var(--gray);font-family:var(--body);font-size:17px;line-height:1.45;min-height:100vh;padding-top:var(--sat);padding-bottom:var(--sab);-webkit-font-smoothing:antialiased;overflow-x:hidden;}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;background:url(/img/rose.webp) no-repeat;background-size:560px;background-position:calc(50% + 260px) -140px;opacity:.06;z-index:0;}
-.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:14px 16px 56px;}
+.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:14px 16px 56px;overflow-x:hidden;overflow-x:clip;}
 button{font-family:var(--disp);cursor:pointer;color:inherit;}
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
 [hidden]{display:none!important;} .hidden{display:none!important;}
@@ -120,7 +120,7 @@ header .menus{margin:3px 0 0;font-size:13.5px;color:var(--gray-3);font-style:ita
 .sheet .chips button i{font-style:normal;font-family:var(--body);text-transform:none;letter-spacing:0;font-size:13px;color:var(--gray-3);margin-left:4px;} .sheet .chips button.on i{color:inherit;opacity:.72;}
 
 /* ---- card stack ---- */
-.stack{position:relative;height:var(--cardH,clamp(430px,62svh,620px));perspective:1400px;margin-top:2px;}
+.stack{position:relative;height:var(--cardH,clamp(480px,70svh,700px));perspective:1400px;margin-top:2px;}
 .ghost{position:absolute;inset:0;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);transform-origin:50% 100%;transition:transform .3s var(--ease),opacity .3s;pointer-events:none;}
 .ghost.g1{transform:translateY(12px) scale(.955);opacity:.9;} .ghost.g2{transform:translateY(24px) scale(.91);opacity:.6;}
 .stack.pull .ghost.g1{transform:translateY(0) scale(1);} .stack.pull .ghost.g2{transform:translateY(12px) scale(.955);opacity:.9;}
@@ -132,7 +132,7 @@ header .menus{margin:3px 0 0;font-size:13.5px;color:var(--gray-3);font-style:ita
 .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;touch-action:pan-y;transition:visibility 0s linear .25s;border-radius:var(--r);background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow-lg);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:22px 20px 20px;display:flex;flex-direction:column;}
 .face::-webkit-scrollbar{width:0;}
 .front{align-items:center;text-align:center;}
-.front .inner{margin:auto 0;width:100%;display:flex;flex-direction:column;align-items:center;}
+.front .inner{margin:auto 0;min-height:100%;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .back{transform:rotateY(180deg);}
 /* Safari still hit-tests a backface-hidden face, so the inactive face is hidden for real (swapped mid-flip). */
 .card:not(.flipped) .back,.card.flipped .front{visibility:hidden;pointer-events:none;}
@@ -143,7 +143,7 @@ header .menus{margin:3px 0 0;font-size:13.5px;color:var(--gray-3);font-style:ita
 .front .cat{margin-top:2px;} .front .name{font-family:var(--disp);font-weight:700;font-size:23px;line-height:1.2;letter-spacing:.04em;text-transform:uppercase;color:var(--gray);margin:14px 0 4px;}
 .front .name.long{font-size:19px;} .front .name.qq{font-family:var(--body);font-weight:500;text-transform:none;letter-spacing:0;font-size:24px;line-height:1.3;}
 .front .price{font-family:var(--body);font-style:italic;font-size:17px;color:var(--gray-2);}
-.front .hint{margin-top:18px;color:var(--gray-3);font-size:14px;font-style:italic;line-height:1.35;max-width:270px;}
+.front .hint{margin-top:12px;color:var(--gray-3);font-size:14px;font-style:italic;line-height:1.35;max-width:270px;}
 .rule{width:44px;height:1px;background:var(--rose);margin:10px auto 0;}
 .mstate{font-family:var(--disp);font-size:10px;letter-spacing:.2em;font-weight:700;margin-top:12px;text-transform:uppercase;}
 .mstate.mastered{color:var(--good);} .mstate.learning{color:var(--rose-deep);} .mstate.unseen{color:var(--gray-4);}
@@ -154,6 +154,8 @@ header .menus{margin:3px 0 0;font-size:13.5px;color:var(--gray-3);font-style:ita
 .qillus svg,.qillus .fillus svg{height:140px;width:auto;display:block;margin:12px auto 0;}
 /* photos */
 .ph{position:relative;margin:12px 0 2px;width:100%;aspect-ratio:4/3;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:var(--bg);}
+/* card front: the photo spans the card and takes most of its height so the plate is legible on a phone */
+.front .phwrap{width:100%;align-self:stretch;flex:1 1 auto;min-height:0;display:flex;flex-direction:column;} .front .ph{aspect-ratio:auto;height:auto;flex:1 1 230px;min-height:230px;max-height:440px;margin-top:10px;}
 .ph img{position:absolute;inset:0;width:100%;height:100%;display:block;-webkit-user-drag:none;pointer-events:none;}
 .ph img.bg{object-fit:cover;filter:blur(18px) saturate(1.05);transform:scale(1.2);opacity:.5;} .ph img.fg{object-fit:contain;}
 .phcap{font-family:var(--disp);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gray-3);margin-top:6px;text-align:center;}

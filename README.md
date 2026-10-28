@@ -84,6 +84,11 @@ How it works: the data files (`js/drinks.js`, `food.js`, `guide.js`, `allergy.js
 
 Handing it over: a new owner needs the manager PIN (Vercel env `MANAGER_PIN`) and nothing else to run the menu day to day. To move hosting, they need the GitHub repo, a Vercel project with a Blob store (`BLOB_READ_WRITE_TOKEN`) and `MANAGER_PIN`; load a downloaded backup in Manager → Menu → Load a backup and publish.
 
+## v5.4.1 (Oct 28 2026) — phone swipe fix · bigger card photos
+
+- iOS Safari zoomed the page out when a card was swiped right: the card flying off-screen widened the document. `html` and `.wrap` now clip horizontal overflow (`overflow-x: clip`, with `hidden` as the fallback), so the page never grows past the viewport.
+- Card front: the photo spans the card and grows to fill the free height (230–440 px instead of a small 4:3 thumbnail), the card stack is taller (`clamp(480px, 70svh, 700px)`), and the hint sits closer so the front still fits without scrolling on an 812 px-tall phone.
+
 ## v5.4.0 (Oct 28 2026) — Fuego streak
 
 - Cards tab: a flame pill on the card stack counts consecutive **Got it** swipes (or the Got it button / → key). It appears at 2, turns orange and flickers from 5 (“¡Fuego!”, “¡En llamas!” at 10), pops on every hit, and milestone toasts land at 5 / 10 / 25 / 50. A **Learning** swipe ends the streak (“Streak ends at N” from 5 up); browse-mode swipes don't touch it. Honors reduced-motion.
